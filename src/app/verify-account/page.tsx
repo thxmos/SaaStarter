@@ -14,6 +14,10 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
+/*
+MAYBE itd be better in the case of success to just redirect and have a toast show up
+*/
+
 interface VerificationStatus {
   isVerified: boolean;
   isNewlyVerified: boolean;
