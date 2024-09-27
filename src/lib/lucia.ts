@@ -1,18 +1,17 @@
-import { Lucia } from 'lucia';
-import { PrismaAdapter } from '@lucia-auth/adapter-prisma';
-import { prisma } from './prisma';
-import { cookies } from 'next/headers';
-import { cache } from 'react';
-import { SessionProviderProps } from '@/providers/session-provider';
+import { Lucia } from "lucia";
+import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
+import { prisma } from "./prisma";
+import { cookies } from "next/headers";
+import { SessionProviderProps } from "@/providers/session-provider";
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
-    name: 'auth_session_cookie',
+    name: "auth_session_cookie",
     expires: false,
     attributes: {
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === "production",
     },
   },
 });
@@ -56,7 +55,7 @@ export const getUser = async (): Promise<SessionProviderProps> => {
   return { user: dbUser, session: session };
 };
 
-declare module 'lucia' {
+declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
   }
