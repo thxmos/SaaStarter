@@ -6,9 +6,10 @@ import { Button } from "./ui/button";
 import SignOutButton from "./sign-out-button";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { User } from "@prisma/client";
 
 interface Props {
-  user: {} | null;
+  user: User | null;
 }
 
 const Navbar: React.FC<Props> = ({ user }) => {
