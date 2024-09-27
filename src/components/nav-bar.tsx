@@ -1,30 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Cpu, LogOut, User } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
-import { logout } from "@/app/auth/auth.action";
+import { Cpu } from "lucide-react";
 import { useSession } from "@/providers/session-provider";
 import { COMPANY_NAME } from "@/constants";
 import LoginButton from "./login-button";
+import DropdownMenu from "./dropdown-menu";
 
 const Navbar = async () => {
   const { user } = useSession();
-
-  const getInitials = (name: string): string => {
-    const words = name.split(" ");
-    const initials = words.map((word) => word.charAt(0).toUpperCase()).join("");
-    return initials;
-  };
 
   const navLinks = [
     {
@@ -56,39 +40,7 @@ const Navbar = async () => {
             {link.name}
           </Link>
         ))}
-        {user && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Avatar className="cursor-pointer">
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback className="bg-red-500 text-white text-xs">
-                  {getInitials(user.name!)}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 mt-1 rounded-t-none border-none">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Link
-                    href="/dashboard"
-                    className="flex items-center justify-between w-full"
-                  >
-                    <p>Dashboard</p>
-                    <User className="text-sm" />
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => logout()}>
-                  <div className="flex items-center justify-between w-full">
-                    <p>Sign Out</p>
-                    <LogOut className="text-sm" />
-                  </div>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        <DropdownMenu user={user} />
         <LoginButton user={user} />
       </nav>
     </header>
