@@ -13,15 +13,15 @@ const Navbar = async () => {
   const navLinks = [
     {
       name: "Features",
-      url: "#features",
+      url: "/#features",
     },
     {
       name: "Pricing",
-      url: "#pricing",
+      url: "/#pricing",
     },
     {
       name: "Contact",
-      url: "#contact",
+      url: "/#contact",
     },
   ];
 
