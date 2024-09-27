@@ -10,7 +10,7 @@ import {
 import { Check } from "lucide-react";
 import Link from "next/link";
 import { Plan } from "./page";
-import { getUser } from "@/lib/lucia";
+import { useSession } from "@/providers/session-provider";
 
 interface Props {
   plan: Plan;
@@ -31,7 +31,8 @@ const PricingCard: React.FC<Props> = async ({
   highlighted,
   plan,
 }) => {
-  const user = await getUser();
+  const { user } = useSession();
+
   return (
     <Card
       className={`flex flex-col min-w-[300px] min ${

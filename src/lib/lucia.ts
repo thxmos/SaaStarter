@@ -16,7 +16,7 @@ export const lucia = new Lucia(adapter, {
   },
 });
 
-export const getUser = async (): Promise<SessionProviderProps> => {
+export const getUser = async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
 
   if (!sessionId) return { user: null, session: null };

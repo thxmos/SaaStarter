@@ -1,5 +1,5 @@
-import { getUser } from "@/lib/lucia";
 import PricingCard from "./pricing-card";
+import { useSession } from "@/providers/session-provider";
 
 export interface Plan {
   link: string;
@@ -37,7 +37,8 @@ export const plans: Plan[] = [
 ];
 
 const SubscribePage = async () => {
-  const user = await getUser();
+  const { user } = useSession();
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">

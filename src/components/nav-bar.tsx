@@ -1,11 +1,10 @@
 "use client";
+
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import SignOutButton from "./sign-out-button";
 
-import { useContext, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
-import { SessionContext } from "@/providers/session-provider";
+import { useState } from "react";
 import { Cpu, LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
@@ -17,29 +16,25 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { logout } from "@/app/auth/auth.action";
+import { useSession } from "@/providers/session-provider";
 
-const Navbar: React.FC = () => {
-  const pathname = usePathname();
-  const { user } = useContext(SessionContext);
+const Navbar = async () => {
+  const { user } = useSession();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth >= 768) {
+  //       setMobileMenuOpen(false);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  //   window.addEventListener("resize", handleResize);
+  //   return () => {
+  //     window.removeEventListener("resize", handleResize);
+  //   };
+  // }, []);
 
   const getInitials = (name: string): string => {
     const words = name.split(" ");
