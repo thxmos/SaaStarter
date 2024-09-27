@@ -5,7 +5,7 @@ import { getUser } from "@/lib/lucia";
 import { redirect } from "next/navigation";
 
 const AuthPage = async () => {
-  const user = await getUser();
+  const { user } = await getUser();
   if (user) {
     redirect("/dashboard");
   }

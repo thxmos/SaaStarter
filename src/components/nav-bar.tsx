@@ -2,29 +2,45 @@
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import SignOutButton from "./sign-out-button";
+
+import { useContext, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { SessionContext } from "@/providers/session-provider";
 import { Cpu, LogOut, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@radix-ui/react-dropdown-menu";
 import { logout } from "@/app/auth/auth.action";
 
-interface Props {
-  user: User | null;
-}
+const Navbar: React.FC = () => {
+  const pathname = usePathname();
+  const { user } = useContext(SessionContext);
 
-const Navbar: React.FC<Props> = ({ user }) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   const getInitials = (name: string): string => {
     const words = name.split(" ");
     const initials = words.map((word) => word.charAt(0).toUpperCase()).join("");

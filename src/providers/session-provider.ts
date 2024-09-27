@@ -1,11 +1,10 @@
 "use client";
-
-import { Session, User } from "lucia";
+import { Session } from "lucia";
 import React from "react";
-import { createContext, Provider, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext } from "react";
 
 export interface SessionProviderProps {
-  user: User | null;
+  user: any;
   session: Session | null;
 }
 
@@ -14,7 +13,7 @@ const defaultSessionProviderProps = {
   session: null,
 };
 
-const SessionContext = createContext<SessionProviderProps>(
+export const SessionContext = createContext<SessionProviderProps>(
   defaultSessionProviderProps,
 );
 

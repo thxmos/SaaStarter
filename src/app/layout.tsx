@@ -42,7 +42,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <Navbar user={user} />
+            <Navbar />
             <Toaster richColors />
             {children}
           </ThemeProvider>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const DashboardPage = async () => {
-  const user = await getUser();
+  const { user } = await getUser();
   if (!user) {
     redirect("/auth");
   }
