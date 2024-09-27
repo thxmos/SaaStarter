@@ -1,38 +1,30 @@
 "use client";
-import { RiMenuFill } from "@remixicon/react";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Button } from "./ui/button";
 import SignOutButton from "./sign-out-button";
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { Cpu, LogOut, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { logout } from "@/app/auth/auth.action";
 
 interface Props {
   user: { name: string | null; email: string; avatar: string | null } | null;
 }
 
 const Navbar: React.FC<Props> = ({ user }) => {
-  const pathname = usePathname();
-
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
   const getInitials = (name: string): string => {
     const words = name.split(" ");
     const initials = words.map((word) => word.charAt(0).toUpperCase()).join("");
@@ -40,71 +32,74 @@ const Navbar: React.FC<Props> = ({ user }) => {
   };
 
   return (
-    <nav className="flex items-center justify-between w-screentext-lg absolute w-screen z-20">
-      <RiMenuFill
-        className="text-2xl md:hidden ml-auto z-20 transition-all duration-300 cursor-pointer absolute top-0 right-0 mr-4 mt-4"
-        style={{
-          transform: mobileMenuOpen ? "rotate(90deg)" : "rotate(0deg)",
-        }}
-        onClick={() => setMobileMenuOpen((prev) => !prev)}
-      />
-
-      <div className="hidden w-[100vw] h-full md:flex md:items-center justify-start md:w-auto gap-4 ml-auto px-4 py-4">
-        {/* <div className='ml-auto flex gap-4 h-full items-center justify-start'> */}
-        {user && user.avatar && (
-          <Link href="/dashboard">
-            <Avatar>
-              <AvatarImage src={user.avatar} />
-              <AvatarFallback className="bg-red-500 text-white text-xs">
-                {getInitials(user.name!)}
-              </AvatarFallback>
-            </Avatar>
-          </Link>
+    <header className="px-4 lg:px-6 h-14 flex items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <Link className="flex items-center justify-center" href="/">
+        <Cpu className="h-6 w-6 text-primary" />
+        <span className="sr-only">SaaSy</span>
+      </Link>
+      <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+        <Link
+          className="text-sm font-medium hover:underline underline-offset-4"
+          href="/#features"
+        >
+          Features
+        </Link>
+        <Link
+          className="text-sm font-medium hover:underline underline-offset-4"
+          href="/#pricing"
+        >
+          Pricing
+        </Link>
+        <Link
+          className="text-sm font-medium hover:underline underline-offset-4"
+          href="/#contact"
+        >
+          Contact
+        </Link>
+        {user && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="cursor-pointer">
+                <AvatarImage src={user.avatar ?? ""} />
+                <AvatarFallback className="bg-red-500 text-white text-xs">
+                  {getInitials(user.name!)}
+                </AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 mt-1 rounded-t-none border-none">
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <Link
+                    href="/dashboard"
+                    className="flex items-center justify-between w-full"
+                  >
+                    <p>Dashboard</p>
+                    <User className="text-sm" />
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => logout()}>
+                  <div className="flex items-center justify-between w-full">
+                    <p>Sign Out</p>
+                    <LogOut className="text-sm" />
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
-        {user && <SignOutButton>Sign Out</SignOutButton>}
+        {/* {user && <SignOutButton>Sign Out</SignOutButton>} */}
         {!user && (
-          <Link href="/auth">
-            <Button>Sign In</Button>
+          <Link
+            href="/auth"
+            className="text-sm font-medium hover:underline underline-offset-4"
+          >
+            Sign In
           </Link>
         )}
-        {/* </div> */}
-      </div>
-
-      {/* Mobile Menu */}
-      <div
-        className="w-full bg-background absolute top-0 left-0 right-0 z-10 transition-all duration-300"
-        style={{
-          minHeight: "100vh",
-          opacity: mobileMenuOpen ? 1 : 0,
-          pointerEvents: mobileMenuOpen ? "all" : "none",
-        }}
-      >
-        <div className="flex flex-col gap-4 p-12">
-          <Link href="/">
-            <p className="py-4 px-4 hover:bg-card transition-all duration-300 rounded-md">
-              Home
-            </p>
-          </Link>
-          <Link href="/dashboard">
-            <p className="py-4 px-4 hover:bg-card transition-all duration-300 rounded-md">
-              Dashboard
-            </p>
-          </Link>
-          {user && (
-            <div className="py-4 px-4">
-              <SignOutButton>Sign Out</SignOutButton>
-            </div>
-          )}
-          {!user && (
-            <Link href="/auth">
-              <div className="py-4 px-4">
-                <Button>Sign In</Button>
-              </div>
-            </Link>
-          )}
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 };
 
