@@ -8,8 +8,8 @@ export async function POST(request: Request) {
 
   if (user?.email && user?.name) {
     const response = await resend.emails.send({
-      from: COMPANY_EMAIL,
-      // from: "onboarding@resend.dev",
+      // from: COMPANY_EMAIL,
+      from: "onboarding@resend.dev",
       to: user.email,
       subject: `Verify your account - ${COMPANY_NAME}`,
       react: WelcomeEmail({ url: "https://example.com", username: user.name }),
