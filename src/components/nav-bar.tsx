@@ -26,7 +26,7 @@ const Navbar = async () => {
   ];
 
   return (
-    <header className="px-4 lg:px-6 h-14 flex items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <Link className="flex items-center justify-center" href="/">
         <Cpu className="h-6 w-6 text-primary" />
         <span className="sr-only">{COMPANY_NAME}</span>
