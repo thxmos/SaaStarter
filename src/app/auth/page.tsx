@@ -2,10 +2,10 @@ import TabSwitcher from "@/components/tab-switcher";
 import SignInForm from "./sign-in-form";
 import SignUpForm from "./sign-up-form";
 import { redirect } from "next/navigation";
-import { useSession } from "@/providers/session-provider";
+import { getUser } from "@/lib/lucia";
 
-const AuthPage = () => {
-  const { user } = useSession();
+const AuthPage = async () => {
+  const { user } = await getUser();
 
   if (user) {
     redirect("/dashboard");

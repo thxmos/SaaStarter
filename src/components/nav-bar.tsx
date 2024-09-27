@@ -16,7 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import { logout } from "@/app/auth/auth.action";
-import { useSession } from "@/providers/session-provider";
+import { getUser } from "@/lib/lucia";
+import { SessionProvider, useSession } from "@/providers/session-provider";
 
 const Navbar = async () => {
   const { user } = useSession();
@@ -100,7 +101,7 @@ const Navbar = async () => {
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        {/* {user && <SignOutButton>Sign Out</SignOutButton>} */}
+        {user && <SignOutButton>Sign Out</SignOutButton>}
         {!user && (
           <Link
             href="/auth"
