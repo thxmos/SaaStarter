@@ -55,7 +55,10 @@ const PricingCard: React.FC<Props> = async ({
         </ul>
       </CardContent>
       <CardFooter>
-        <Link href={`${plan.link}?prefilled_email=${user?.email}`}>
+        <Link
+          target="_blank"
+          href={`${plan.link}?prefilled_email=${user?.email}`}
+        >
           <Button
             className="w-full"
             variant={highlighted ? "default" : "outline"}
