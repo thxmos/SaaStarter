@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { getGoogleOauthConsentUrl, signIn } from "./auth.action";
 import { RiGoogleFill } from "@remixicon/react";
 
+export type SignInSchema = z.infer<typeof signInSchema>;
+
 export const signInSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),

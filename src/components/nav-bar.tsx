@@ -22,21 +22,6 @@ import { SessionProvider, useSession } from "@/providers/session-provider";
 const Navbar = async () => {
   const { user } = useSession();
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     if (window.innerWidth >= 768) {
-  //       setMobileMenuOpen(false);
-  //     }
-  //   };
-
-  //   window.addEventListener("resize", handleResize);
-  //   return () => {
-  //     window.removeEventListener("resize", handleResize);
-  //   };
-  // }, []);
-
   const getInitials = (name: string): string => {
     const words = name.split(" ");
     const initials = words.map((word) => word.charAt(0).toUpperCase()).join("");

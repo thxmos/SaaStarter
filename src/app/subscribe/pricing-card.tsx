@@ -10,7 +10,7 @@ import {
 import { Check } from "lucide-react";
 import Link from "next/link";
 import { Plan } from "./page";
-import { useSession } from "@/providers/session-provider";
+import { getUser } from "@/lib/lucia";
 
 interface Props {
   plan: Plan;
@@ -31,7 +31,7 @@ const PricingCard: React.FC<Props> = async ({
   highlighted,
   plan,
 }) => {
-  const { user } = useSession();
+  const {user} = await getUser();
 
   return (
     <Card
