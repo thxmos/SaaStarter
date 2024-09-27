@@ -7,17 +7,18 @@ export async function POST(request: Request) {
   const { user } = await getUser();
 
   if (user?.email && user?.name) {
-    const data = await resend.emails.send({
+    const response = await resend.emails.send({
       from: COMPANY_EMAIL,
+      // from: "onboarding@resend.dev",
       to: user.email,
       subject: `Verify your account - ${COMPANY_NAME}`,
       react: WelcomeEmail({ url: "https://example.com", username: user.name }),
     });
-    return Response.json({
-      name: user.name,
-      to: user.email,
-      from: COMPANY_EMAIL,
-    });
+    if (response.data === null) {
+      Response.json(response.error);
+    } else {
+      return Response.json(response.data);
+    }
   }
-  return Response.json({ ...user });
+  return Response.json({ message: "Something went wrong" }, { status: 500 });
 }
