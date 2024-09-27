@@ -1,4 +1,3 @@
-import { getUser } from "@/lib/lucia";
 import PricingCard from "./pricing-card";
 
 export interface Plan {
@@ -37,7 +36,6 @@ export const plans: Plan[] = [
 ];
 
 const SubscribePage = async () => {
-  const user = await getUser();
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">

@@ -2,7 +2,6 @@ import { Lucia } from "lucia";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { prisma } from "./prisma";
 import { cookies } from "next/headers";
-import { SessionProviderProps } from "@/providers/session-provider";
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
@@ -16,7 +15,7 @@ export const lucia = new Lucia(adapter, {
   },
 });
 
-export const getUser = async (): Promise<SessionProviderProps> => {
+export const getUser = async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
 
   if (!sessionId) return { user: null, session: null };

@@ -14,6 +14,10 @@ model User {
   role     UserRole @default(USER)
   password String?
   avatar   String?
+  isVerified Boolean @default(false)
+  is2faEnabled Boolean @default(false)
+  createdAt     DateTime @default(now())  // Automatically set on creation
+  updatedAt     DateTime @updatedAt       // Automatically updated on modification
 
   stripeCustomerId String? @unique
   stripePriceId    String?

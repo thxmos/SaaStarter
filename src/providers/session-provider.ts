@@ -13,7 +13,7 @@ const defaultSessionProviderProps = {
   session: null,
 };
 
-export const SessionContext = createContext<SessionProviderProps>(
+const SessionContext = createContext<SessionProviderProps>(
   defaultSessionProviderProps,
 );
 

@@ -31,7 +31,8 @@ const PricingCard: React.FC<Props> = async ({
   highlighted,
   plan,
 }) => {
-  const user = await getUser();
+  const {user} = await getUser();
+
   return (
     <Card
       className={`flex flex-col min-w-[300px] min ${
