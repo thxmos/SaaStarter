@@ -21,7 +21,7 @@ import {
 import { logout } from "@/app/auth/auth.action";
 
 interface Props {
-  user: { name: string | null; email: string; avatar: string | null } | null;
+  user: User | null;
 }
 
 const Navbar: React.FC<Props> = ({ user }) => {

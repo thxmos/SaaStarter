@@ -2,6 +2,7 @@ import { Lucia } from "lucia";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { prisma } from "./prisma";
 import { cookies } from "next/headers";
+import { SessionProviderProps } from "@/providers/session-provider";
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
@@ -15,14 +16,12 @@ export const lucia = new Lucia(adapter, {
   },
 });
 
-export const getUser = async () => {
+export const getUser = async (): Promise<SessionProviderProps> => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
 
-  if (!sessionId) return null;
+  if (!sessionId) return { user: null, session: null };
 
-  const { session, user } = await lucia.validateSession(sessionId);
-
-  if (!session || !user) return null;
+  const { user, session } = await lucia.validateSession(sessionId);
 
   try {
     if (session && session.fresh) {
@@ -44,13 +43,20 @@ export const getUser = async () => {
   } catch (error) {}
 
   const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
+    where: { id: user?.id },
     select: {
+      id: true,
       name: true,
       email: true,
       avatar: true,
     },
   });
 
-  return dbUser;
+  return { user: dbUser, session: session };
 };
+
+declare module "lucia" {
+  interface Register {
+    Lucia: typeof lucia;
+  }
+}
