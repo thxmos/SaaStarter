@@ -10,14 +10,15 @@ datasource db {
 model User {
   id       String   @id @default(cuid())
   email    String   @unique
-  name     String?
-  role     UserRole @default(USER)
+  name    String?
+  // firstName String?
+  // lastName String?
+  // role     UserRole @default(USER)
   password String?
   avatar   String?
   isVerified Boolean @default(false)
-  is2faEnabled Boolean @default(false)
-  createdAt     DateTime @default(now())  // Automatically set on creation
-  updatedAt     DateTime @updatedAt       // Automatically updated on modification
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   stripeCustomerId String? @unique
   stripePriceId    String?
@@ -26,10 +27,10 @@ model User {
   session Session[]
 }
 
-enum UserRole {
-  USER
-  ADMIN
-}
+// enum UserRole {
+//   USER
+//   ADMIN
+// }
 
 model Session {
   id        String   @id
@@ -37,4 +38,12 @@ model Session {
   expiresAt DateTime
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String   
+  createdAt     DateTime @default(now())
+  expiresAt DateTime
 }

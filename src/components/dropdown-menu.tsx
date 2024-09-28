@@ -54,7 +54,6 @@ const DropdownMenu: React.FC<Props> = ({ user }) => {
         </DropdownMenuContent>
       </DropdownWrapper>
     );
-  else return;
 };
 
 export default DropdownMenu;

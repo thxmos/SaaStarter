@@ -18,7 +18,7 @@ interface Props {
 
 const SecurityTab: React.FC<Props> = ({ user }) => {
   return (
-    <TabsContent value="security" className="space-y-4">
+    <>
       <Card>
         <CardHeader>
           <CardTitle>Security Settings</CardTitle>
@@ -56,7 +56,7 @@ const SecurityTab: React.FC<Props> = ({ user }) => {
           </div>
         </CardContent>
       </Card>
-    </TabsContent>
+    </>
   );
 };
 

@@ -9,13 +9,7 @@ interface Props {
 }
 
 const LoginButton: React.FC<Props> = ({ user }) => {
-  if (user) {
-    return (
-      <Button onClick={() => logout()} variant="destructive">
-        Log Out
-      </Button>
-    );
-  } else {
+  if (!user)
     return (
       <Link
         href="/auth"
@@ -24,7 +18,7 @@ const LoginButton: React.FC<Props> = ({ user }) => {
         Log In
       </Link>
     );
-  }
+  else return;
 };
 
 export default LoginButton;
