@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getInitials } from "@/helpers";
 import { TabsContent } from "@radix-ui/react-tabs";
-import { Delete, Upload } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -98,7 +98,7 @@ const AccountTab: React.FC<Props> = ({ user }) => {
               </Label>
               <Label onClick={handleAvatarDelete} className="cursor-pointer">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground text-red-600">
-                  <Delete size={16} />
+                  <X size={16} />
                   <span>Delete avatar</span>
                 </div>
               </Label>
