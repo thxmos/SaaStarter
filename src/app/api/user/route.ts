@@ -3,9 +3,8 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse the JSON body from the request
     const body = await request.json();
-    const { id, avatar, name } = body;
+    const { id, avatar, name, isSubscribed } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -14,7 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const updateDto = { avatar, name };
+    const updateDto = { name, avatar, isSubscribed };
 
     const res = await prisma.user.update({
       where: { id: id },

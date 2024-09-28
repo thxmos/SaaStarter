@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,12 +12,102 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Download, Settings } from "lucide-react";
+import { toast } from "sonner";
+import { useSession } from "@/providers/session-provider";
+import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   user: any;
 }
 
-const BillingTab: React.FC<Props> = ({ user }) => {
+const mockBillingHistory = [
+  {
+    date: "July 1, 2024",
+    amount: "$29.99",
+    invoiceUrl: "/invoices/july-2024.pdf",
+  },
+  {
+    date: "June 1, 2024",
+    amount: "$29.99",
+    invoiceUrl: "/invoices/june-2024.pdf",
+  },
+];
+
+const BillingTab: React.FC<Props> = () => {
+  const { user } = useSession();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [billingInfo, setBillingInfo] = useState({
+    cardNumber: "",
+    expirationDate: "",
+    cvv: "",
+    billingAddress: "",
+  });
+
+  const badgeFactory = () => {
+    const isSubscribed = user.isSubscribed;
+    if (isSubscribed) {
+      return (
+        <Badge variant="secondary" className="text-sm">
+          Active
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge variant="outline" className="text-sm">
+          Inactive
+        </Badge>
+      );
+    }
+  };
+
+  const handleChangePlan = async () => {
+    const res = await fetch("/api/user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: user.id,
+        isSubscribed: !user.isSubscribed,
+      }),
+    });
+    if (res.ok) {
+      toast.success("Successfully updated your plan", {
+        duration: 2000,
+      });
+    } else {
+      toast.error("Couldn't update your plan", {
+        duration: 2000,
+      });
+    }
+  };
+
+  const handleBillingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBillingInfo({
+      ...billingInfo,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleUpdateBillingInfo = () => {
+    console.log("Updated billing info:", billingInfo);
+    toast.success("Billing information updated successfully", {
+      duration: 2000,
+    });
+    setIsModalOpen(false);
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -27,11 +120,11 @@ const BillingTab: React.FC<Props> = ({ user }) => {
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-lg font-semibold">Current Plan</h3>
-            <p className="text-gray-500">Pro Plan</p>
+            <p className="text-gray-500">
+              {user.isSubscribed ? "Pro Plan" : "Free Plan"}
+            </p>
           </div>
-          <Badge variant="secondary" className="text-sm">
-            Active
-          </Badge>
+          {badgeFactory()}
         </div>
 
         <div>
@@ -52,31 +145,95 @@ const BillingTab: React.FC<Props> = ({ user }) => {
         <div>
           <h3 className="text-lg font-semibold mb-2">Billing History</h3>
           <ul className="space-y-2">
-            <li className="flex justify-between items-center">
-              <span>July 1, 2024</span>
-              <span className="text-gray-500">$29.99</span>
-              <Button variant="ghost" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Invoice
-              </Button>
-            </li>
-            <li className="flex justify-between items-center">
-              <span>June 1, 2024</span>
-              <span className="text-gray-500">$29.99</span>
-              <Button variant="ghost" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Invoice
-              </Button>
-            </li>
+            {mockBillingHistory.map((item) => (
+              <li key={item.date} className="flex justify-between items-center">
+                <span>{item.date}</span>
+                <span className="text-gray-500">{item.amount}</span>
+                <Link href={item.invoiceUrl}>
+                  <Button variant="ghost" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Invoice
+                  </Button>
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </CardContent>
       <CardFooter className="flex space-x-4 place-content-end">
-        <Button variant="outline">Change Plan</Button>
-        <Button>
-          <Settings className="h-4 w-4 mr-2" />
-          Manage Billing
+        <Button variant="outline" onClick={handleChangePlan}>
+          Change Plan
         </Button>
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Settings className="h-4 w-4 mr-2" />
+              Manage Billing
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Update Billing Information</DialogTitle>
+              <DialogDescription>
+                Make changes to your billing details here. Click save when
+                you're done.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="cardNumber" className="text-right">
+                  Card Number
+                </Label>
+                <Input
+                  id="cardNumber"
+                  name="cardNumber"
+                  value={billingInfo.cardNumber}
+                  onChange={handleBillingInfoChange}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="expirationDate" className="text-right">
+                  Expiration Date
+                </Label>
+                <Input
+                  id="expirationDate"
+                  name="expirationDate"
+                  value={billingInfo.expirationDate}
+                  onChange={handleBillingInfoChange}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="cvv" className="text-right">
+                  CVV
+                </Label>
+                <Input
+                  id="cvv"
+                  name="cvv"
+                  value={billingInfo.cvv}
+                  onChange={handleBillingInfoChange}
+                  className="col-span-3"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="billingAddress" className="text-right">
+                  Billing Address
+                </Label>
+                <Input
+                  id="billingAddress"
+                  name="billingAddress"
+                  value={billingInfo.billingAddress}
+                  onChange={handleBillingInfoChange}
+                  className="col-span-3"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleUpdateBillingInfo}>Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardFooter>
     </Card>
   );
