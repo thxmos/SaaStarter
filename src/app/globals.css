@@ -56,6 +56,52 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  .bean {
+    --background: 26 50% 5%;
+    --foreground: 26 5% 90%;
+    --card: 26 50% 5%;
+    --card-foreground: 26 5% 90%;
+    --popover: 26 50% 5%;
+    --popover-foreground: 26 5% 90%;
+    --primary: 26 17.4% 18%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 26 30% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: -12 30% 15%;
+    --muted-foreground: 26 5% 60%;
+    --accent: -12 30% 15%;
+    --accent-foreground: 26 5% 90%;
+    --destructive: 0 81% 30%;
+    --destructive-foreground: 26 5% 90%;
+    --border: 26 30% 18%;
+    --input: 26 30% 18%;
+    --ring: 26 17.4% 18%;
+    --radius: 0.5rem;
+  }
+
+  .blue {
+    --background: 201 10% 6%;
+    --foreground: 201 0% 90%;
+    --card: 201 0% 6%;
+    --card-foreground: 201 0% 90%;
+    --popover: 201 10% 5%;
+    --popover-foreground: 201 0% 90%;
+    --primary: 201 49% 31%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 201 10% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 163 10% 15%;
+    --muted-foreground: 201 0% 60%;
+    --accent: 163 10% 15%;
+    --accent-foreground: 201 0% 90%;
+    --destructive: 0 50% 30%;
+    --destructive-foreground: 201 0% 90%;
+    --border: 201 20% 18%;
+    --input: 201 20% 18%;
+    --ring: 201 49% 31%;
+    --radius: 0.5rem;
+  }
 }
 @layer base {
   * {
