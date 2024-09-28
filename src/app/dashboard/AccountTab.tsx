@@ -41,6 +41,7 @@ const AccountTab: React.FC<Props> = ({ user }) => {
             Update your personal information and profile picture.
           </CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-4">
           <div className="flex flex-col items-center space-y-2">
             <Avatar className="w-24 h-24">
@@ -66,10 +67,7 @@ const AccountTab: React.FC<Props> = ({ user }) => {
               onChange={handleAvatarChange}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input id="username" placeholder={user.username} disabled />
-          </div>
+
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" placeholder={user.email} disabled />

@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, LayoutDashboard, Lock, User } from "lucide-react";
+import { CreditCard, LayoutDashboard, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 import { Tabs } from "@/components/ui/tabs";
 import { useSession } from "@/providers/session-provider";
 import AccountTab from "./AccountTab";
-import DashboardTab from "./BeanMachineTab";
 import BillingTab from "./BillingTab";
 import { TabsContent } from "@radix-ui/react-tabs";
 import BeanMachineTab from "./BeanMachineTab";

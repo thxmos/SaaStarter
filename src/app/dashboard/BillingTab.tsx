@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Download, Settings } from "lucide-react";
-import { TabsContent } from "@radix-ui/react-tabs";
 
 interface Props {
   user: any;
