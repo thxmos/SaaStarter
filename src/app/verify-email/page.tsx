@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import VerificationStatus from "./VerificationStatus";
-import { getUser } from "@/lib/lucia";
 
 async function verifyToken(token: string) {
   const urlPrefix = `${process.env.NEXT_PUBLIC_URL}`;
@@ -22,7 +21,8 @@ export default async function VerifyEmail({
   const token = searchParams.token;
 
   if (!token) {
-    redirect("/error-404");
+    // display toast on redirect
+    redirect("/auth");
   }
 
   let message, isVerified;

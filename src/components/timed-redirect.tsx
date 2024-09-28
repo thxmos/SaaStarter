@@ -23,7 +23,7 @@ export default function TimedRedirect() {
 
   return (
     <p className="mt-4 text-sm text-gray-600">
-      Redirecting to dashboard in {countdown} seconds...
+      Redirecting in {countdown} seconds...
     </p>
   );
 }

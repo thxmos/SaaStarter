@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getInitials } from "@/helpers";
 import { TabsContent } from "@radix-ui/react-tabs";
-import { Upload } from "lucide-react";
+import { Delete, Upload } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -23,6 +24,7 @@ interface Props {
 
 const AccountTab: React.FC<Props> = ({ user }) => {
   const [avatar, setAvatar] = useState<string | null>(user.avatar);
+  const [name, setName] = useState<string>(user.name);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -35,16 +37,31 @@ const AccountTab: React.FC<Props> = ({ user }) => {
     }
   };
 
-  const handleSubmit = () => {
-    // fetch("/api/update-profile", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // });
-    toast.success("Successfully updated your profile", {
-      duration: 2000,
+  const handleAvatarDelete = () => {
+    setAvatar(null);
+  };
+
+  const handleSubmit = async () => {
+    const res = await fetch("/api/user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: user.id,
+        avatar,
+        name: name,
+      }),
     });
+    if (res.ok) {
+      toast.success("Successfully updated your profile", {
+        duration: 2000,
+      });
+    } else {
+      toast.error("Couldn't update your profile", {
+        duration: 2000,
+      });
+    }
   };
 
   return (
@@ -60,41 +77,53 @@ const AccountTab: React.FC<Props> = ({ user }) => {
         <CardContent className="space-y-4">
           <div className="flex flex-col items-center space-y-2">
             <Avatar className="w-24 h-24">
-              <AvatarImage
-                src={
-                  avatar || "/placeholder.svg?height=96&width=96&text=Avatar"
-                }
-                alt="Avatar"
-              />
-              <AvatarFallback>Avatar</AvatarFallback>
+              <AvatarImage src={avatar!} alt="Avatar" />
+              <AvatarFallback className="bg-red-500 text-white text-xs">
+                {getInitials(user.name!)}
+              </AvatarFallback>{" "}
             </Avatar>
-            <Label htmlFor="avatar-upload" className="cursor-pointer">
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground">
-                <Upload size={16} />
-                <span>Upload new avatar</span>
-              </div>
-            </Label>
-            <Input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleAvatarChange}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder={user.email} disabled />
+            <div className="grid grid-cols-2 gap-4">
+              <Label htmlFor="avatar-upload" className="cursor-pointer">
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground">
+                  <Upload size={16} />
+                  <span>Upload new avatar</span>
+                </div>
+                <Input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+              </Label>
+              <Label onClick={handleAvatarDelete} className="cursor-pointer">
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground text-red-600">
+                  <Delete size={16} />
+                  <span>Delete avatar</span>
+                </div>
+              </Label>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="first-name">First Name</Label>
-              <Input id="first-name" placeholder="Enter your first name" />
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder={user.email}
+                disabled
+              />
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="last-name">Last Name</Label>
-              <Input id="last-name" placeholder="Enter your last name" />
+              <Label htmlFor="first-name">Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
           </div>
         </CardContent>
