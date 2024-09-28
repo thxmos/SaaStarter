@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Upload } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface Props {
   user: any;
@@ -30,6 +33,18 @@ const AccountTab: React.FC<Props> = ({ user }) => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleSubmit = () => {
+    // fetch("/api/update-profile", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // });
+    toast.success("Successfully updated your profile", {
+      duration: 2000,
+    });
   };
 
   return (
@@ -84,7 +99,7 @@ const AccountTab: React.FC<Props> = ({ user }) => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button>Save Changes</Button>
+          <Button onClick={handleSubmit}>Save Changes</Button>
         </CardFooter>
       </Card>
     </TabsContent>
