@@ -10,12 +10,13 @@ datasource db {
 model User {
   id       String   @id @default(cuid())
   email    String   @unique
-  name     String?
-  role     UserRole @default(USER)
+  name    String?
+  // firstName String?
+  // lastName String?
+  // role     UserRole @default(USER)
   password String?
   avatar   String?
   isVerified Boolean @default(false)
-  is2faEnabled Boolean @default(false)
   createdAt     DateTime @default(now())  // Automatically set on creation
   updatedAt     DateTime @updatedAt       // Automatically updated on modification
 
@@ -26,10 +27,10 @@ model User {
   session Session[]
 }
 
-enum UserRole {
-  USER
-  ADMIN
-}
+// enum UserRole {
+//   USER
+//   ADMIN
+// }
 
 model Session {
   id        String   @id

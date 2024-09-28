@@ -13,3 +13,31 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Types
+
+```
+type User {
+    id: String,
+    username: String,
+    email: String,
+    password: String,
+    createdAt: Date,
+    updatedAt: Date
+}
+
+type Product {
+    name: "",
+    price: "",
+    description: "",
+    createdAt: Date,
+    updatedAt: Date
+}
+
+type Purchase {
+    userId: String,
+    productId: String,
+    createdAt: Date,
+    updatedAt: Date
+}
+```

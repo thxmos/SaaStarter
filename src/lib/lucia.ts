@@ -22,6 +22,8 @@ export const getUser = async () => {
 
   const { user, session } = await lucia.validateSession(sessionId);
 
+  if (!session) return { user: null, session: null };
+
   try {
     if (session && session.fresh) {
       const sessionCookie = lucia.createSessionCookie(sessionId);

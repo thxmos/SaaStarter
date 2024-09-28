@@ -2,15 +2,15 @@ import { COMPANY_NAME } from "@/constants";
 import { Button, Html } from "@react-email/components";
 import * as React from "react";
 
-type Props = { url: string; username: string };
+type Props = { url: string; name: string };
 
 export function WelcomeEmail(props: Props) {
-  const { url, username } = props;
+  const { url, name } = props;
 
   return (
     <Html>
       <p>
-        Hi {username}, Thank you for signing up with
+        Hi {name}, Thank you for signing up with
         {COMPANY_NAME}! To complete your registration and verify your email
         address, please click the link below:
       </p>
