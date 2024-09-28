@@ -63,6 +63,7 @@ export async function GET(req: NextRequest, res: Response) {
         email: googleData.email.toLowerCase(),
         name: googleData.name,
         avatar: googleData.picture,
+        isVerified: false,
       },
     });
     userId = user.id;
