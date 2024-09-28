@@ -6,7 +6,7 @@ import Navbar from "@/components/nav-bar";
 import { getUser } from "@/lib/lucia";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SessionProvider } from "@/providers/session-provider";
-import { COMPANY_DESCRIPTION, COMPANY_NAME } from "@/constants";
+import { APP_DESCRIPTION, APP_NAME } from "@/constants";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -20,8 +20,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: COMPANY_NAME,
-  description: COMPANY_DESCRIPTION,
+  title: APP_NAME,
+  description: APP_DESCRIPTION,
 };
 
 export default async function RootLayout({

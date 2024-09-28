@@ -11,9 +11,11 @@ import DashboardTab from "./BeanMachineTab";
 import BillingTab from "./BillingTab";
 import { TabsContent } from "@radix-ui/react-tabs";
 import BeanMachineTab from "./BeanMachineTab";
+import { redirect } from "next/navigation";
 
 export default function UserDashboard() {
   const { user } = useSession();
+  if (!user) return redirect("/");
 
   const tabStyles = "mr-2 h-4 w-4";
   const tabs = [

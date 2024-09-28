@@ -50,6 +50,7 @@ export const getUser = async () => {
       name: true,
       email: true,
       avatar: true,
+      isVerified: true,
       isSubscribed: true,
     },
   });

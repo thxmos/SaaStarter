@@ -1,4 +1,4 @@
-import { COMPANY_NAME } from "@/constants";
+import { APP_NAME } from "@/constants";
 import { Button } from "../ui/button";
 
 const HeroSection = () => {
@@ -8,7 +8,7 @@ const HeroSection = () => {
         <div className="flex flex-col items-center space-y-4 text-center">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Revolutionize Your Workflow with {COMPANY_NAME}
+              Revolutionize Your Workflow with {APP_NAME}
             </h1>
             <p className="mx-auto max-w-[700px] text-primary-foreground/80 md:text-xl">
               Boost productivity, streamline processes, and take your business

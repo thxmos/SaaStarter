@@ -17,8 +17,8 @@ model User {
   password String?
   avatar   String?
   isVerified Boolean @default(false)
-  createdAt     DateTime @default(now())  // Automatically set on creation
-  updatedAt     DateTime @updatedAt       // Automatically updated on modification
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   stripeCustomerId String? @unique
   stripePriceId    String?
@@ -38,4 +38,12 @@ model Session {
   expiresAt DateTime
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String   
+  createdAt     DateTime @default(now())
+  expiresAt DateTime
 }

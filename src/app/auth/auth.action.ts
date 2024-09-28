@@ -10,6 +10,26 @@ import { signInSchema } from "./sign-in-form";
 import { redirect } from "next/navigation";
 import { generateCodeVerifier, generateState } from "arctic";
 import { googleOAuthClient } from "@/lib/googleOauth";
+import { createVerificationToken } from "@/utils/createVerificationToken";
+import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
+
+export const sendVerifyEmail = async (email: string) => {
+  if (!email) {
+    return { error: "Email is required", status: 400 };
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    return { error: "User not found", status: 404 };
+  }
+
+  const token = await createVerificationToken(user.id);
+  const res = await sendVerificationEmail(user.email, token, user.name ?? "");
+  if (res.status !== 200) return { error: "Couldn't send email", status: 500 };
+
+  return res;
+};
 
 export const signUp = async (values: z.infer<typeof signUpSchema>) => {
   try {
@@ -30,14 +50,13 @@ export const signUp = async (values: z.infer<typeof signUpSchema>) => {
       },
     });
 
-    const session = await lucia.createSession(user.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
-    return { success: true };
+    const res = await sendVerifyEmail(user.email);
+
+    if (res.status !== 200) {
+      return { error: "Couldn't send email", success: false };
+    }
+
+    return { user, success: true };
   } catch (error) {
     return { error: "Something went wrong", success: false };
   }
