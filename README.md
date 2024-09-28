@@ -45,3 +45,7 @@ type Purchase {
     updatedAt: Date
 }
 ```
+
+### Theme Gen
+
+https://zippystarter.com/tools/shadcn-ui-theme-generator

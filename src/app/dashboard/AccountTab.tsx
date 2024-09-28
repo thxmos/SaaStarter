@@ -17,14 +17,32 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import { Upload, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import FileUpload, { FileType } from "@/components/file-upload";
+import { uploadBlob } from "@/actions/blob.actions";
+import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
+import { useRouter } from "next/navigation";
 
 interface Props {
   user: any;
 }
 
 const AccountTab: React.FC<Props> = ({ user }) => {
+  const router = useRouter();
   const [avatar, setAvatar] = useState<string | null>(user.avatar);
   const [name, setName] = useState<string>(user.name);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -64,6 +82,29 @@ const AccountTab: React.FC<Props> = ({ user }) => {
     }
   };
 
+  const handleAvatarUpload = async () => {
+    const isSessionValid = await isValidSession();
+    if (!isSessionValid) return;
+    if (!avatarFile) return;
+    const formData = new FormData();
+    formData.append("file", avatarFile);
+    formData.append("path", "avatars/");
+    setIsUploadingAvatar(true);
+
+    const blob = await uploadBlob(formData);
+
+    if (blob) {
+      toast.success("File uploaded successfully");
+      await updateUserAvatar(blob.url);
+      setIsUploadingAvatar(false);
+      router.refresh();
+      setIsModalOpen(false);
+    } else {
+      setIsUploadingAvatar(false);
+      toast.error("Failed to upload file");
+    }
+  };
+
   return (
     <TabsContent value="account" className="space-y-4">
       <Card>
@@ -75,35 +116,43 @@ const AccountTab: React.FC<Props> = ({ user }) => {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <div className="flex flex-col items-center space-y-2">
-            <Avatar className="w-24 h-24">
-              <AvatarImage src={avatar!} alt="Avatar" />
-              <AvatarFallback className="bg-red-500 text-white text-xs">
-                {getInitials(user.name!)}
-              </AvatarFallback>{" "}
-            </Avatar>
-            <div className="grid grid-cols-2 gap-4">
-              <Label htmlFor="avatar-upload" className="cursor-pointer">
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground">
-                  <Upload size={16} />
-                  <span>Upload new avatar</span>
-                </div>
-                <Input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
-              </Label>
-              <Label onClick={handleAvatarDelete} className="cursor-pointer">
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-foreground text-red-600">
-                  <X size={16} />
-                  <span>Delete avatar</span>
-                </div>
-              </Label>
+          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+            <div className="w-36 grid place-items-center">
+              <Avatar className="w-24 h-24">
+                <AvatarImage src={avatar!} alt="Avatar" />
+                <AvatarFallback className="bg-red-500 text-white text-xs">
+                  {getInitials(user.name!)}
+                </AvatarFallback>
+              </Avatar>
             </div>
-          </div>
+            <DialogTrigger asChild>
+              <Button>
+                <Upload className="h-4 w-4 mr-2" />
+                Update Avatar
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Update User Avatar</DialogTitle>
+                <DialogDescription>
+                  Upload an image and click upload file to update your avatar.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <FileUpload
+                  fileType={FileType.Image}
+                  file={avatarFile}
+                  setFile={setAvatarFile}
+                  onUpload={handleAvatarUpload}
+                  acceptedTypes={{
+                    "image/jpeg": [],
+                    "image/png": [],
+                  }}
+                  uploading={isUploadingAvatar}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
