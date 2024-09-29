@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { LogOut, User } from "lucide-react";
+import { LogOut, Settings, User } from "lucide-react";
 import { getInitials } from "@/helpers";
 
 interface Props {
@@ -46,25 +46,37 @@ export default function DropdownMenu({ user }: Props) {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link
-              href="/dashboard"
-              className="flex items-center justify-between w-full"
-              onClick={closeDropdown}
-            >
-              <p>Dashboard</p>
-              <User className="text-sm" />
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <button
-              onClick={handleLogout}
-              className="flex items-center justify-between w-full"
-            >
-              <p>Sign Out</p>
-              <LogOut className="text-sm" />
-            </button>
-          </DropdownMenuItem>
+          {[
+            {
+              href: "/dashboard",
+              label: "Dashboard",
+              icon: User,
+            },
+            {
+              href: "/settings",
+              label: "Settings",
+              icon: Settings,
+            },
+            {
+              href: "#",
+              label: "Sign Out",
+              icon: LogOut,
+              onClick: handleLogout,
+            },
+          ].map((item, index) => (
+            <DropdownMenuItem asChild key={index}>
+              {
+                <Link
+                  href={item.href}
+                  className="flex items-center justify-between w-full"
+                  onClick={item.onClick ?? closeDropdown}
+                >
+                  <p>{item.label}</p>
+                  <item.icon className="text-sm" />
+                </Link>
+              }
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownWrapper>

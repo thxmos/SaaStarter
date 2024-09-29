@@ -96,7 +96,7 @@ export async function passwordReset(formData: FormData, userId: string) {
     }
 
     const isCurrentPasswordValid = await argon2.verify(
-      user.password,
+      user.password!,
       currentPassword,
     );
     if (!isCurrentPasswordValid) {

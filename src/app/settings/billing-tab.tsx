@@ -11,22 +11,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Download, Settings, User } from "lucide-react";
+import { CreditCard, Download } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/providers/session-provider";
 import Link from "next/link";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { updateUser } from "./dashboard.action";
+
+import { updateUser } from "./settings.action";
 import { getSubscriptions } from "@/actions/stripe.actions";
 
 interface Props {

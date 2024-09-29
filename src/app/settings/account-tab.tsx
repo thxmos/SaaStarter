@@ -31,7 +31,7 @@ import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
 import { useRouter } from "next/navigation";
 import { User } from "@/types/user";
 import { useSession } from "@/providers/session-provider";
-import { updateUser } from "./dashboard.action";
+import { updateUser } from "./settings.action";
 
 interface Props {
   user: User;

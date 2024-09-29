@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutDashboard } from "lucide-react";
+import { CreditCard, User, Lock, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
 import { useSession } from "@/providers/session-provider";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { redirect } from "next/navigation";
-import BeanMachineTab from "../dashboard/bean-machine-tab";
+import AccountTab from "./account-tab";
+import BillingTab from "./billing-tab";
+import SecurityTab from "./security-tab";
 
-export default function Dashboard({
+export default function UserSettings({
   searchParams,
 }: {
   searchParams: { tab?: string };
@@ -19,10 +21,22 @@ export default function Dashboard({
 
   const tabs = [
     {
-      key: "bean-machine",
-      label: "Bean Machine",
-      icon: <LayoutDashboard className={"mr-2 h-4 w-4"} />,
-      tabContent: <BeanMachineTab />,
+      key: "account",
+      label: "Account",
+      icon: <User className={"mr-2 h-4 w-4"} />,
+      tabContent: <AccountTab user={user} />,
+    },
+    {
+      key: "security",
+      label: "Security",
+      icon: <Lock className={"mr-2 h-4 w-4"} />,
+      tabContent: <SecurityTab user={user} />,
+    },
+    {
+      key: "billing",
+      label: "Billing",
+      icon: <CreditCard className={"mr-2 h-4 w-4"} />,
+      tabContent: <BillingTab user={user} />,
     },
   ];
 
@@ -33,8 +47,8 @@ export default function Dashboard({
       {/* Sidebar */}
       <aside className="w-64 bg-card p-6 shadow-md">
         <div className="flex items-center mb-8">
-          <LayoutDashboard className="h-8 w-8 text-primary mr-2" />
-          <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
+          <Settings className="h-8 w-8 text-primary mr-2" />
+          <h2 className="text-2xl font-bold text-foreground">Settings</h2>
         </div>
         <nav>
           {tabs.map((tab) => (

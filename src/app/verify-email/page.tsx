@@ -1,5 +1,3 @@
-"use server";
-
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import VerificationStatus from "./verification-status";
