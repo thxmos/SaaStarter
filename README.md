@@ -36,6 +36,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - documentation
   - where to get env variables
   - commands
+- session is not refreshed when user signs it so it brings them to "/"
 
 ### Verification / Auth
 
