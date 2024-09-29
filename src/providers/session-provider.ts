@@ -28,6 +28,10 @@ export const SessionProvider = ({
 }) => {
   const [user, setUser] = useState<any>(sessionUser);
 
+  useEffect(() => {
+    setUser(sessionUser);
+  }, [session]);
+
   return React.createElement(
     SessionContext.Provider,
     {
