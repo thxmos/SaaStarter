@@ -30,34 +30,21 @@ import FileUpload, { FileType } from "@/components/file-upload";
 import { uploadBlob } from "@/actions/blob.actions";
 import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
 import { useRouter } from "next/navigation";
+import { User } from "@/types/user";
+import { useSession } from "@/providers/session-provider";
 
 interface Props {
-  user: any;
+  user: User;
 }
 
 const AccountTab: React.FC<Props> = ({ user }) => {
+  const { setUser } = useSession();
   const router = useRouter();
-  const [avatar, setAvatar] = useState<string | null>(user.avatar);
-  const [name, setName] = useState<string>(user.name);
+  const [name, setName] = useState<string>(user.name!);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatar(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleAvatarDelete = () => {
-    setAvatar(null);
-  };
 
   const handleSubmit = async () => {
     const res = await fetch("/api/user", {
@@ -67,7 +54,6 @@ const AccountTab: React.FC<Props> = ({ user }) => {
       },
       body: JSON.stringify({
         id: user.id,
-        avatar,
         name: name,
       }),
     });
@@ -99,6 +85,7 @@ const AccountTab: React.FC<Props> = ({ user }) => {
       setIsUploadingAvatar(false);
       router.refresh();
       setIsModalOpen(false);
+      setUser({ ...user, avatar: blob.url });
     } else {
       setIsUploadingAvatar(false);
       toast.error("Failed to upload file");
@@ -119,7 +106,7 @@ const AccountTab: React.FC<Props> = ({ user }) => {
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <div className="w-36 grid place-items-center">
               <Avatar className="w-24 h-24">
-                <AvatarImage src={avatar!} alt="Avatar" />
+                <AvatarImage src={user.avatar ?? ""} alt="Avatar" />
                 <AvatarFallback className="bg-red-500 text-white text-xs">
                   {getInitials(user.name!)}
                 </AvatarFallback>

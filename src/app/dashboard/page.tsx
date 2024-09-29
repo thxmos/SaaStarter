@@ -78,7 +78,9 @@ export default function UserDashboard() {
           >
             {tabs.map((tab) => {
               return (
-                <TabsContent value={tab.key}>{tab.tabContent}</TabsContent>
+                <TabsContent key={tab.key} value={tab.key}>
+                  {tab.tabContent}
+                </TabsContent>
               );
             })}
           </Tabs>
