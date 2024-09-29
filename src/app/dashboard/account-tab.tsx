@@ -96,7 +96,7 @@ const AccountTab: React.FC<Props> = ({ user }) => {
       <Card>
         <form onSubmit={handleSubmit}>
           <CardHeader>
-            <CardTitle>User Settings</CardTitle>
+            <CardTitle className="text-2xl">User Settings</CardTitle>
             <CardDescription>
               Update your personal information and profile picture.
             </CardDescription>

@@ -1,5 +1,3 @@
-import { COMPANY_NAME } from "@/constants";
-import { Button } from "../ui/button";
 import { CheckCircle, Code, Globe, Zap } from "lucide-react";
 
 const FeaturesSection = () => {

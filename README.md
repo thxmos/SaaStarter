@@ -2,6 +2,24 @@
 - email-verify page check if already verified and just redirect to dashboard
 - button disable on email resend, login, sign up
 
+- allow users to view actual stripe billing data from account settings
+
+- Products
+
+  - id, purchaseId,
+  - webhook from stripe to populate db when new product is added
+
+- Purchase
+
+  - link userId to productId
+  - quantity, stripe transactionId?
+  - webhook to update transactionId from stripe (if needed)
+
+- dont make server actions ingest forms, process forms from client components
+- layout to prevent page scrolling when unecessary
+- users can set theme in profile
+- make avatar dropdown close on click
+
 ## Getting Started
 
 First, run the development server:

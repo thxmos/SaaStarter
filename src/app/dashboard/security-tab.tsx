@@ -14,16 +14,21 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { TabsContent } from "@/components/ui/tabs";
 import React, { useState, useTransition, useRef } from "react";
-import { passwordReset } from "./dashboard.action";
 import { toast } from "sonner";
+import { passwordReset, updateUser } from "./dashboard.action";
 
-interface Props {
-  user: any;
+interface User {
+  id: string;
+  is2faEnabled: boolean;
 }
 
-const SecurityTab: React.FC<Props> = ({ user }) => {
+interface Props {
+  user: User;
+}
+
+export default function SecurityTab({ user }: Props) {
   const [isPending, startTransition] = useTransition();
-  const [is2faEnabled, setIs2faEnabled] = useState(user.is2faEnabled);
+  // const [is2faEnabled, setIs2faEnabled] = useState(user.is2faEnabled);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -37,7 +42,7 @@ const SecurityTab: React.FC<Props> = ({ user }) => {
           toast.success(result.message);
           formRef.current?.reset();
         } else {
-          toast.error(result.message);
+          throw new Error(result.message);
         }
       } catch (error) {
         console.error(error);
@@ -46,19 +51,37 @@ const SecurityTab: React.FC<Props> = ({ user }) => {
     });
   };
 
-  //TODO: Implement handle2faToggle function
-  const handle2faToggle = (checked: boolean) => {
-    setIs2faEnabled(checked);
-    toast.success(
-      `Two-factor authentication ${checked ? "enabled" : "disabled"}`,
-    );
-  };
+  // const handle2faToggle = (checked: boolean) => {
+  //   startTransition(async () => {
+  //     try {
+  //       const formData = new FormData();
+  //       formData.append("id", user.id);
+  //       formData.append("is2faEnabled", checked.toString());
+
+  //       const result = await updateUser(formData);
+
+  //       if (result.success) {
+  //         console.log("2FA status updated");
+  //         setIs2faEnabled(checked);
+  //         toast.success(
+  //           `Two-factor authentication ${checked ? "enabled" : "disabled"}`,
+  //         );
+  //       } else {
+  //         console.log("Error updating 2FA status:", result.message);
+  //         throw new Error(result.message);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error updating 2FA status:", error);
+  //       toast.error("Couldn't update two-factor authentication status");
+  //     }
+  //   });
+  // };
 
   return (
-    <TabsContent value="security" className="space-y-4">
+    <>
       <Card>
         <CardHeader>
-          <CardTitle>Security Settings</CardTitle>
+          <CardTitle className="text-2xl">Security Settings</CardTitle>
           <CardDescription>Manage your account's security.</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit} ref={formRef}>
@@ -122,7 +145,7 @@ const SecurityTab: React.FC<Props> = ({ user }) => {
           </CardFooter>
         </form>
       </Card>
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Two-Factor Authentication</CardTitle>
           <CardDescription>
@@ -135,13 +158,14 @@ const SecurityTab: React.FC<Props> = ({ user }) => {
               id="2fa"
               checked={is2faEnabled}
               onCheckedChange={handle2faToggle}
+              disabled={isPending}
             />
-            <Label htmlFor="2fa">Enable Two-Factor Authentication</Label>
+            <Label htmlFor="2fa">
+              {isPending ? "Updating..." : "Enable Two-Factor Authentication"}
+            </Label>
           </div>
         </CardContent>
-      </Card>
-    </TabsContent>
+      </Card> */}
+    </>
   );
-};
-
-export default SecurityTab;
+}

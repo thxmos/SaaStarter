@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getSubscriptions } from "@/actions/stripe.actions";
+import { updateUser } from "./dashboard.action";
 
 interface Props {
   user: any;
@@ -52,6 +52,7 @@ const BillingTab: React.FC<Props> = () => {
     return null;
   }
 
+  const [isSubscribed, setIsSubscribed] = useState(user.isSubscribed);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [billingInfo, setBillingInfo] = useState({
     cardNumber: "",
@@ -78,25 +79,29 @@ const BillingTab: React.FC<Props> = () => {
   };
 
   const handleChangePlan = async () => {
-    const res = await fetch("/api/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: user.id,
-        isSubscribed: !user.isSubscribed,
-      }),
+    startTransition(async () => {
+      try {
+        const formData = new FormData();
+        formData.append("id", user.id);
+        formData.append("isSubscribed", String(!isSubscribed));
+
+        const result = await updateUser(formData);
+
+        if (result.message === "User successfully updated!") {
+          setIsSubscribed(!isSubscribed);
+          toast.success("Successfully updated your plan", {
+            duration: 2000,
+          });
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        console.error("Error updating plan:", error);
+        toast.error("Couldn't update your plan", {
+          duration: 2000,
+        });
+      }
     });
-    if (res.ok) {
-      toast.success("Successfully updated your plan", {
-        duration: 2000,
-      });
-    } else {
-      toast.error("Couldn't update your plan", {
-        duration: 2000,
-      });
-    }
   };
 
   const handleBillingInfoChange = (e: React.ChangeEvent<HTMLInputElement>) => {

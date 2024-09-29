@@ -20,6 +20,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Coffee, Loader2 } from "lucide-react";
+import React from "react";
 
 export default function BeanMachineTab() {
   const [beanType, setBeanType] = useState("arabica");
@@ -46,7 +47,7 @@ export default function BeanMachineTab() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Mega Bean Generator</CardTitle>
+          <CardTitle className="text-2xl">Mega Bean Generator</CardTitle>
           <CardDescription>
             Customize your bean and generate a Mega Bean!
           </CardDescription>
