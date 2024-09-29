@@ -7,7 +7,7 @@ import { APP_NAME } from "@/constants";
 import LoginButton from "./login-button";
 import DropdownMenu from "./dropdown-menu";
 
-const Navbar = async () => {
+const Navbar = () => {
   const { user } = useSession();
 
   const navLinks = [
