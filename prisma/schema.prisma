@@ -22,7 +22,8 @@ model User {
   stripePriceId    String?
   isSubscribed     Boolean @default(false)
 
-  session Session[]
+  session       Session[]
+  subscriptions Price[]   @relation("UserSubscriptions")
 }
 
 // enum UserRole {
@@ -49,7 +50,47 @@ model VerificationToken {
 model PasswordResetToken {
   id        String   @id @default(cuid())
   token     String   @unique
-  userId    String   
-  createdAt     DateTime @default(now())
+  userId    String
+  createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model Price {
+  id              String               @id @default(cuid())
+  productId       String?              @map("product_id")
+  active          Boolean?
+  description     String?
+  unitAmount      BigInt?              @map("unit_amount")
+  currency        String?
+  type            PricingType?
+  interval        PricingPlanInterval?
+  intervalCount   Int?                 @map("interval_count")
+  trialPeriodDays Int?                 @map("trial_period_days")
+  metadata        Json?
+
+  product Product? @relation(fields: [productId], references: [id])
+  users   User[]   @relation("UserSubscriptions")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  active      Boolean?
+  name        String?
+  description String?
+  image       String?
+  metadata    Json?
+
+  prices Price[]
+}
+
+enum PricingType {
+  RECURRING
+  ONE_TIME
+}
+
+enum PricingPlanInterval {
+  DAY
+  WEEK
+  MONTH
+  YEAR
 }

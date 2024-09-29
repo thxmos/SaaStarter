@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (eventType) {
+      case "product.created": {
+        const product = data.object as Stripe.Product;
+      }
+
       case "checkout.session.completed": {
         const checkout = data.object as Stripe.Checkout.Session;
         let user;
