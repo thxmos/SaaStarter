@@ -15,22 +15,23 @@ export async function verifyEmail(token: string) {
       return { message: "Invalid or expired token", success: false };
     }
 
+    // TODO: sign in user on verification
     // Ensure user is not already verified and sign them in
-    const user = await prisma.user.findUnique({
-      where: { id: verificationToken.userId },
-    });
+    // const user = await prisma.user.findUnique({
+    //   where: { id: verificationToken.userId },
+    // });
 
-    if (!user || user.isVerified) {
-      return { error: "Already verified", success: false };
-    }
+    // if (!user || user.isVerified) {
+    //   return { error: "Already verified", success: false };
+    // }
 
-    const session = await lucia.createSession(user.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
+    // const session = await lucia.createSession(user.id, {});
+    // const sessionCookie = lucia.createSessionCookie(session.id);
+    // cookies().set(
+    //   sessionCookie.name,
+    //   sessionCookie.value,
+    //   sessionCookie.attributes,
+    // );
 
     // Update user as verified
     await prisma.user.update({
@@ -42,7 +43,7 @@ export async function verifyEmail(token: string) {
       where: { id: verificationToken.id },
     });
 
-    revalidatePath("/dashboard/*");
+    revalidatePath("/*");
 
     return { message: "Email successfully verified!", success: true };
   } catch (error) {

@@ -43,6 +43,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - create cookie and log the user in after they verify their email
 - redirect only routes
 - 2fa enablement
+- fill out user info on google oauth
 
 ### Refactor / Clean up
 
