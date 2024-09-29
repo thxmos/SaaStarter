@@ -1,7 +1,8 @@
-import { Lucia } from "lucia";
+import { Lucia, Session } from "lucia";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { prisma } from "./prisma";
 import { cookies } from "next/headers";
+import { User } from "@/types/user";
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
@@ -17,7 +18,6 @@ export const lucia = new Lucia(adapter, {
 
 export const getUser = async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
-
   if (!sessionId) return { user: null, session: null };
 
   const { user, session } = await lucia.validateSession(sessionId);
@@ -47,10 +47,14 @@ export const getUser = async () => {
     where: { id: user?.id },
     select: {
       id: true,
-      name: true,
       email: true,
+      name: true,
       avatar: true,
       isVerified: true,
+      createdAt: true,
+      updatedAt: true,
+      stripeCustomerId: true,
+      stripePriceId: true,
       isSubscribed: true,
     },
   });

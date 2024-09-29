@@ -1,38 +1,48 @@
 "use client";
-import { Session } from "lucia";
-import React from "react";
-import { createContext, ReactNode, useContext } from "react";
 
-export interface SessionProviderProps {
-  user: any;
+import { User } from "@/types/user";
+import { Session } from "lucia";
+import React, { createElement, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode } from "react";
+
+interface SessionContextType {
   session: Session | null;
+  user: User | null;
+  setUser: (user: User) => void;
 }
 
-const defaultSessionProviderProps = {
-  user: null,
+const SessionContext = createContext<SessionContextType>({
   session: null,
-};
+  user: null,
+  setUser: () => {},
+});
 
-const SessionContext = createContext<SessionProviderProps>(
-  defaultSessionProviderProps,
-);
+export const SessionProvider = ({
+  children,
+  sessionUser,
+  session,
+}: {
+  children: ReactNode;
+  sessionUser: any;
+  session: Session | null;
+}) => {
+  const [user, setUser] = useState<any>(sessionUser);
+
+  return React.createElement(
+    SessionContext.Provider,
+    {
+      value: { user, session, setUser },
+    },
+    children,
+  );
+};
 
 export const useSession = () => {
   const sessionContext = useContext(SessionContext);
 
   if (!sessionContext) {
-    throw new Error("useSession must be used within a SessionProvider");
+    throw new Error("useSession must be used within 1 SessionProvider");
   }
 
   return sessionContext;
-};
-
-export const SessionProvider = ({
-  children,
-  value,
-}: {
-  children: ReactNode;
-  value: SessionProviderProps;
-}) => {
-  return React.createElement(SessionContext.Provider, { value }, children);
 };

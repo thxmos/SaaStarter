@@ -29,18 +29,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getUser();
+  const { user, session } = await getUser();
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider value={user}>
+        <SessionProvider session={session} sessionUser={user}>
           <ThemeProvider
             attribute="class"
             // defaultTheme="system"
-            defaultTheme="light"
+            defaultTheme="blue"
             enableSystem
             disableTransitionOnChange
           >
