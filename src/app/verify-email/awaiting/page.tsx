@@ -19,11 +19,15 @@ import { toast } from "sonner";
 import { useSession } from "@/providers/session-provider";
 import { redirect } from "next/navigation";
 
-export default function AwaitingVerification() {
+export default function AwaitingVerification({
+  searchParams,
+}: {
+  searchParams: { email?: string };
+}) {
   const { user } = useSession();
   if (user) redirect("/");
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.email ?? "");
   const [isPending, startTransition] = useTransition();
   const [resendStatus, setResendStatus] = useState<
     "idle" | "success" | "error"

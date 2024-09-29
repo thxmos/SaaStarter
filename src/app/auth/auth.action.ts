@@ -86,6 +86,7 @@ export const signUp = async (values: SignUpSchema) => {
       },
     });
 
+    // Create Stripe customer and update user with Stripe customer ID
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
     if (!user.name || !user.email) {
@@ -98,7 +99,6 @@ export const signUp = async (values: SignUpSchema) => {
     });
 
     if (stripeCustomer.id !== undefined) {
-      // Update user with Stripe customer ID
       await prisma.user.update({
         where: { id: user.id },
         data: { stripeCustomerId: stripeCustomer.id },
@@ -107,6 +107,7 @@ export const signUp = async (values: SignUpSchema) => {
       console.error("Failed to create Stripe customer for user", user);
     }
 
+    // Send verification email
     const res = await sendVerifyEmail(user.email);
 
     if (res.status !== 200) {
@@ -139,30 +140,6 @@ export const signIn = async (values: SignInSchema) => {
       values.password,
     );
     if (!passwordMatch) return { error: "Invalid Credentials", success: false };
-
-    const session = await lucia.createSession(user.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
-    return { success: true };
-  } catch (error) {
-    return { error: "Something went wrong", success: false };
-  }
-};
-
-export const signInAfterVerify = async (email: string) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: email.toLowerCase(),
-      },
-    });
-
-    if (!user || user.isVerified)
-      return { error: "Already verified", success: false };
 
     const session = await lucia.createSession(user.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);

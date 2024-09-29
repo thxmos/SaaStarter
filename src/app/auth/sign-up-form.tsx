@@ -55,7 +55,7 @@ const SignUpForm = () => {
     const res = await signUp(values);
     if (res.success) {
       toast.success("Account created successfully");
-      router.push("/verify-email/awaiting");
+      router.push(`/verify-email/awaiting?email=${values.email}`);
     } else {
       toast.error(res.error);
     }
