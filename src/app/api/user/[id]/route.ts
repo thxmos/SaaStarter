@@ -42,9 +42,9 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string; avatar: string; name: string } },
+  { params }: { params: { id: string; name: string } },
 ) {
-  const { id, avatar, name } = params;
+  const { id, name } = params;
 
   if (!id) {
     return NextResponse.json(
@@ -54,7 +54,7 @@ export async function POST(
   }
 
   try {
-    const updateDto = { avatar, name };
+    const updateDto = { name };
 
     const res = await prisma.user.update({
       where: { id: id },
