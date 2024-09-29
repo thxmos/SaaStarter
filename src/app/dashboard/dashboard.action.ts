@@ -38,7 +38,7 @@ export async function updateUser(formData: FormData) {
     const id = formData.get("id");
     const avatar = formData.get("avatar");
     const name = formData.get("name");
-    const twoFaEnabled = formData.get("2faEnabled") === "true";
+    const is2faEnabled = formData.get("2faEnabled") === "true";
     const isSubscribed = formData.get("isSubscribed") === "true";
 
     if (!id || typeof id !== "string") {
@@ -48,8 +48,8 @@ export async function updateUser(formData: FormData) {
     const updateDto = {
       name: typeof name === "string" ? name : undefined,
       avatar: typeof avatar === "string" ? avatar : undefined,
-      twoFaEnabled:
-        typeof twoFaEnabled === "boolean" ? twoFaEnabled : undefined,
+      // is2faEnabled:
+      //   typeof is2faEnabled === "boolean" ? is2faEnabled : undefined,
       isSubscribed:
         typeof isSubscribed === "boolean" ? isSubscribed : undefined,
     };
@@ -65,7 +65,7 @@ export async function updateUser(formData: FormData) {
     }
 
     console.log("User successfully updated");
-    revalidatePath("/profile"); // Adjust this path as needed
+    // revalidatePath("/dashboard"); // Adjust this path as needed
     return { message: "User successfully updated!", success: true };
   } catch (error) {
     console.error(error);
