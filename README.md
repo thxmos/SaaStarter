@@ -20,6 +20,9 @@
 - users can set theme in profile
 - make avatar dropdown close on click
 
+- verify different devices / location
+-
+
 ## Getting Started
 
 First, run the development server:

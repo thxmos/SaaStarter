@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import VerificationStatus from "./verification-status";
 import { verifyEmail } from "./verify-email.action";
 import { getUser } from "@/lib/lucia";
-import { toast } from "sonner";
 
 export default async function VerifyEmail({
   searchParams,
@@ -11,7 +10,7 @@ export default async function VerifyEmail({
   searchParams: { token?: string };
 }) {
   const { user } = await getUser();
-  const isVerified = user?.isVerified ?? false;
+  let isVerified = user?.isVerified ?? false;
 
   if (isVerified) {
     redirect("/dashboard");
@@ -26,7 +25,9 @@ export default async function VerifyEmail({
   let message;
 
   const res = await verifyEmail(token);
+
   if (res.success) {
+    isVerified = true;
     message = res.message;
   } else {
     message =

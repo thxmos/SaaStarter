@@ -77,7 +77,6 @@ export async function POST(req: NextRequest) {
         const user = await prisma.user.findUnique({
           where: { stripeCustomerId: subscription.customer as string },
         });
-        console.log(user);
         if (!user) break;
 
         await prisma.user.update({

@@ -12,6 +12,7 @@ import { googleOAuthClient } from "@/lib/googleOauth";
 import { createVerificationToken } from "@/utils/createVerificationToken";
 import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
 import { createPasswordResetToken, sendPasswordResetEmail } from "./utils";
+import { Stripe } from "stripe";
 
 export const sendResetEmail = async (values: ForgotPasswordSchema) => {
   try {
@@ -69,13 +70,14 @@ export const signUp = async (values: SignUpSchema) => {
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
-        email: values.email,
+        email: email,
       },
     });
     if (existingUser) return { error: "User already exists", success: false };
 
-    const hashedPassword = await new Argon2id().hash(values.password);
+    const hashedPassword = await new Argon2id().hash(password);
 
+    // Create user in the database
     const user = await prisma.user.create({
       data: {
         email: values.email.toLowerCase(),
@@ -84,14 +86,39 @@ export const signUp = async (values: SignUpSchema) => {
       },
     });
 
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+    if (!user.name || !user.email) {
+      console.error("Couldn't create Stripe customer: missing user data", user);
+    }
+
+    const stripeCustomer = await stripe.customers.create({
+      email: email.toLowerCase(),
+      name: name,
+    });
+
+    if (stripeCustomer.id !== undefined) {
+      // Update user with Stripe customer ID
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { stripeCustomerId: stripeCustomer.id },
+      });
+    } else {
+      console.error("Failed to create Stripe customer for user", user);
+    }
+
     const res = await sendVerifyEmail(user.email);
 
     if (res.status !== 200) {
       return { error: "Couldn't send email", success: false };
     }
 
-    return { user, success: true };
+    return {
+      user: { ...user, stripeCustomerId: stripeCustomer.id },
+      success: true,
+    };
   } catch (error) {
+    console.error("SignUp error:", error);
     return { error: "Something went wrong", success: false };
   }
 };
@@ -112,6 +139,30 @@ export const signIn = async (values: SignInSchema) => {
       values.password,
     );
     if (!passwordMatch) return { error: "Invalid Credentials", success: false };
+
+    const session = await lucia.createSession(user.id, {});
+    const sessionCookie = lucia.createSessionCookie(session.id);
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
+    return { success: true };
+  } catch (error) {
+    return { error: "Something went wrong", success: false };
+  }
+};
+
+export const signInAfterVerify = async (email: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email.toLowerCase(),
+      },
+    });
+
+    if (!user || user.isVerified)
+      return { error: "Already verified", success: false };
 
     const session = await lucia.createSession(user.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
