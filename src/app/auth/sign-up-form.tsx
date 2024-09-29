@@ -37,9 +37,11 @@ export const signUpSchema = z
     path: ["confirmPassword"],
   });
 
+export type SignUpSchema = z.infer<typeof signUpSchema>;
+
 const SignUpForm = () => {
   const router = useRouter();
-  const form = useForm<z.infer<typeof signUpSchema>>({
+  const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
       confirmPassword: "",
@@ -49,7 +51,7 @@ const SignUpForm = () => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof signUpSchema>) => {
+  const onSubmit = async (values: SignUpSchema) => {
     const res = await signUp(values);
     if (res.success) {
       toast.success("Account created successfully");

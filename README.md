@@ -1,3 +1,7 @@
+- redirect only routes
+- email-verify page check if already verified and just redirect to dashboard
+- button disable on email resend, login, sign up
+
 ## Getting Started
 
 First, run the development server:

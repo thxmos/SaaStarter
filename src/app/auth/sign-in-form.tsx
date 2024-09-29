@@ -24,19 +24,23 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getGoogleOauthConsentUrl, signIn } from "./auth.action";
+import {
+  getGoogleOauthConsentUrl,
+  sendResetEmail,
+  signIn,
+} from "./auth.action";
 
 export const signInSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
 
-export const forgotPasswordSchema = z.object({
+export const passwordResetSchema = z.object({
   email: z.string().email(),
 });
 
 export type SignInSchema = z.infer<typeof signInSchema>;
-export type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
+export type ForgotPasswordSchema = z.infer<typeof passwordResetSchema>;
 
 const SignInForm = () => {
   const router = useRouter();
@@ -51,7 +55,7 @@ const SignInForm = () => {
   });
 
   const forgotPasswordForm = useForm<ForgotPasswordSchema>({
-    resolver: zodResolver(forgotPasswordSchema),
+    resolver: zodResolver(passwordResetSchema),
     defaultValues: {
       email: "",
     },
@@ -68,10 +72,13 @@ const SignInForm = () => {
   };
 
   const onForgotPasswordSubmit = async (values: ForgotPasswordSchema) => {
-    // Implement the forgot password functionality here
-    console.log("Forgot password for:", values.email);
-    toast.success("Password reset email sent. Please check your inbox.");
-    setIsForgotPassword(false);
+    const res = await sendResetEmail(values);
+    if (res.success) {
+      toast.success("Reset email sent");
+      setIsForgotPassword(false);
+    } else {
+      toast.error(res.error);
+    }
   };
 
   return (

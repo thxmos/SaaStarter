@@ -1,17 +1,51 @@
 "use server";
 
-import { z } from "zod";
-import { signUpSchema } from "./sign-up-form";
+import { SignUpSchema } from "./sign-up-form";
 import { prisma } from "@/lib/prisma";
 import { Argon2id } from "oslo/password";
 import { lucia } from "@/lib/lucia";
 import { cookies } from "next/headers";
-import { signInSchema } from "./sign-in-form";
+import { ForgotPasswordSchema, SignInSchema } from "./sign-in-form";
 import { redirect } from "next/navigation";
 import { generateCodeVerifier, generateState } from "arctic";
 import { googleOAuthClient } from "@/lib/googleOauth";
 import { createVerificationToken } from "@/utils/createVerificationToken";
 import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
+import { sendPasswordResetEmail } from "@/app/auth/sendPasswordResetEmail";
+import { createPasswordResetToken } from "@/app/auth/createPasswordResetToken";
+
+export const sendResetEmail = async (values: ForgotPasswordSchema) => {
+  try {
+    const { email } = values;
+    if (!email) {
+      return { error: "Email is required", status: 400 };
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return { error: "User not found", status: 404 };
+    }
+
+    const token = await createPasswordResetToken(user.id);
+
+    if (!token) {
+      return { error: "Couldn't create token", status: 500 };
+    }
+
+    const res = await sendPasswordResetEmail(
+      user.email,
+      token,
+      user.name ?? "",
+    );
+
+    if (res.status !== 200)
+      return { error: "Couldn't send email", status: 500 };
+
+    return { success: true };
+  } catch (error) {
+    return { error: "Something went wrong", status: 500 };
+  }
+};
 
 export const sendVerifyEmail = async (email: string) => {
   if (!email) {
@@ -31,7 +65,8 @@ export const sendVerifyEmail = async (email: string) => {
   return res;
 };
 
-export const signUp = async (values: z.infer<typeof signUpSchema>) => {
+export const signUp = async (values: SignUpSchema) => {
+  const { email, name, password } = values;
   try {
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -62,7 +97,7 @@ export const signUp = async (values: z.infer<typeof signUpSchema>) => {
   }
 };
 
-export const signIn = async (values: z.infer<typeof signInSchema>) => {
+export const signIn = async (values: SignInSchema) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
