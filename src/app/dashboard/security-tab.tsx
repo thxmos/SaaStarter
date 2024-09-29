@@ -11,15 +11,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { TabsContent } from "@/components/ui/tabs";
-import React, { useState, useTransition, useRef } from "react";
+import React, { useTransition, useRef } from "react";
 import { toast } from "sonner";
-import { passwordReset, updateUser } from "./dashboard.action";
+import { passwordReset } from "./dashboard.action";
 
 interface User {
   id: string;
-  is2faEnabled: boolean;
+  // is2faEnabled: boolean;
 }
 
 interface Props {

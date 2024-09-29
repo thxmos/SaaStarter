@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 
 export interface Subscription {
@@ -64,3 +65,36 @@ export const getSubscriptions = async (
     return { success: false, subscription: null };
   }
 };
+
+export async function getPrices(active: boolean = true) {
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+    const prices = await stripe.prices.list({
+      active,
+      // limit: 10,
+      expand: ["data.product"], // This will include the associated product details
+    });
+
+    // Revalidate the path to ensure fresh data on the client
+    revalidatePath("/*"); // check this works properly
+
+    return {
+      success: true,
+      prices: prices.data.map((price) => ({
+        id: price.id,
+        // productName: price.product.name,
+        unitAmount: price.unit_amount,
+        currency: price.currency,
+        type: price.type,
+        interval: price.recurring?.interval,
+      })),
+    };
+  } catch (error) {
+    console.error("Error fetching Stripe prices:", error);
+    return {
+      success: false,
+      error: "Failed to fetch prices. Please try again later.",
+    };
+  }
+}

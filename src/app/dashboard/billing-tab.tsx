@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Download, Settings } from "lucide-react";
+import { CreditCard, Download, Settings, User } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/providers/session-provider";
 import Link from "next/link";
@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateUser } from "./dashboard.action";
+import { getSubscriptions } from "@/actions/stripe.actions";
 
 interface Props {
   user: any;
@@ -79,6 +80,9 @@ const BillingTab: React.FC<Props> = () => {
   };
 
   const handleChangePlan = async () => {
+    const res = await getSubscriptions(user.id);
+    console.log(res);
+
     startTransition(async () => {
       try {
         const formData = new FormData();
@@ -172,10 +176,16 @@ const BillingTab: React.FC<Props> = () => {
         </div>
       </CardContent>
       <CardFooter className="flex space-x-4 place-content-end">
-        <Button variant="outline" onClick={handleChangePlan}>
+        <Link
+          target="_blank"
+          href={`https://billing.stripe.com/p/login/test_8wM17y7ej2tF5vG9AA?prefilled_email=${user.email}`}
+        >
+          <Button variant="outline">Customer Portal</Button>
+        </Link>
+        {/* <Button variant="outline" onClick={handleChangePlan}>
           Change Plan
-        </Button>
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        </Button> */}
+        {/* <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
             <Button>
               <Settings className="h-4 w-4 mr-2" />
@@ -244,7 +254,7 @@ const BillingTab: React.FC<Props> = () => {
               <Button onClick={handleUpdateBillingInfo}>Save changes</Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
       </CardFooter>
     </Card>
   );
