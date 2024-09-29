@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getSubscriptions } from "@/actions/stripe.actions";
 
 interface Props {
   user: any;
@@ -46,6 +47,11 @@ const mockBillingHistory = [
 
 const BillingTab: React.FC<Props> = () => {
   const { user } = useSession();
+
+  if (!user) {
+    return null;
+  }
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [billingInfo, setBillingInfo] = useState({
     cardNumber: "",

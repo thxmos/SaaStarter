@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, LayoutDashboard, User } from "lucide-react";
+import { CreditCard, LayoutDashboard, User, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
 import { useSession } from "@/providers/session-provider";
-import AccountTab from "./AccountTab";
-import BillingTab from "./BillingTab";
 import { TabsContent } from "@radix-ui/react-tabs";
-import BeanMachineTab from "./BeanMachineTab";
 import { redirect } from "next/navigation";
+import AccountTab from "./account-tab";
+import BillingTab from "./billing-tab";
+import BeanMachineTab from "./bean-machine-tab";
+import SecurityTab from "./security-tab";
 
 export default function UserDashboard() {
   const { user } = useSession();
@@ -29,12 +30,12 @@ export default function UserDashboard() {
       icon: <User className={tabStyles} />,
       tabContent: <AccountTab user={user} />,
     },
-    // {
-    //   key: "security",
-    //   label: "Security",
-    //   icon: <Lock className={tabStyles} />,
-    //   tabContent: <SecurityTab user={user} />,
-    // },
+    {
+      key: "security",
+      label: "Security",
+      icon: <Lock className={tabStyles} />,
+      tabContent: <SecurityTab user={user} />,
+    },
     {
       key: "billing",
       label: "Billing",

@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Card,
   CardContent,
@@ -30,7 +28,6 @@ export default function VerificationStatus({
   const buttonText = isVerified
     ? "Go to Dashboard"
     : "Resend Verification Email";
-  const buttonHref = isVerified ? "/auth" : "/resend-verification";
 
   return (
     <Card className="w-[350px] max-w-[90%]">
@@ -45,7 +42,7 @@ export default function VerificationStatus({
       </CardContent>
       <CardFooter className="flex justify-center flex-col">
         <Button asChild>
-          <Link href={buttonHref}>{buttonText}</Link>
+          <Link href="/auth">{buttonText}</Link>
         </Button>
         <div className="flex items-center justify-center mb-4">
           {isVerified && <TimedRedirect />}

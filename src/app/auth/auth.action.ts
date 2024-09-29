@@ -11,8 +11,7 @@ import { generateCodeVerifier, generateState } from "arctic";
 import { googleOAuthClient } from "@/lib/googleOauth";
 import { createVerificationToken } from "@/utils/createVerificationToken";
 import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
-import { sendPasswordResetEmail } from "@/app/auth/sendPasswordResetEmail";
-import { createPasswordResetToken } from "@/app/auth/createPasswordResetToken";
+import { createPasswordResetToken, sendPasswordResetEmail } from "./utils";
 
 export const sendResetEmail = async (values: ForgotPasswordSchema) => {
   try {

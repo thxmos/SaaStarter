@@ -30,6 +30,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { user, session } = await getUser();
+  //TODO: apply user layout
 
   return (
     <html lang="en">
@@ -40,7 +41,7 @@ export default async function RootLayout({
           <ThemeProvider
             attribute="class"
             // defaultTheme="system"
-            defaultTheme="blue"
+            defaultTheme="bean"
             enableSystem
             disableTransitionOnChange
           >
