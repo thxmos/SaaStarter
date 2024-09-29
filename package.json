@@ -45,6 +45,7 @@
     "@radix-ui/react-tooltip": "^1.1.2",
     "@react-email/components": "^0.0.25",
     "@remixicon/react": "^4.2.0",
+    "@types/argon2": "^0.15.0",
     "@vercel/blob": "^0.24.0",
     "arctic": "^1.9.2",
     "class-variance-authority": "^0.7.0",

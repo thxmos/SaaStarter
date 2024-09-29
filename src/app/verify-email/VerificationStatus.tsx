@@ -30,7 +30,7 @@ export default function VerificationStatus({
   const buttonText = isVerified
     ? "Go to Dashboard"
     : "Resend Verification Email";
-  const buttonHref = isVerified ? "/dashboard" : "/resend-verification";
+  const buttonHref = isVerified ? "/auth" : "/resend-verification";
 
   return (
     <Card className="w-[350px] max-w-[90%]">
