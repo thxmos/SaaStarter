@@ -1,5 +1,8 @@
 "use client";
 
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getInitials } from "@/helpers";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { Upload } from "lucide-react";
-import { useState, useTransition } from "react";
-import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -28,22 +28,36 @@ import {
 import FileUpload, { FileType } from "@/components/file-upload";
 import { uploadBlob } from "@/actions/blob.actions";
 import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
-import { useRouter } from "next/navigation";
-import { User } from "@/types/user";
 import { useSession } from "@/providers/session-provider";
 import { updateUser } from "./settings.action";
+import { User } from "@/types/user";
+import { getInitials } from "@/helpers";
 
 interface Props {
   user: User;
 }
 
-const AccountTab: React.FC<Props> = ({ user }) => {
+const themes = [
+  { name: "bight", color: "#ffffff" },
+  { name: "dark", color: "#1f2937" },
+  { name: "blue", color: "#3b82f6" },
+  { name: "green", color: "#10b981" },
+  { name: "purple", color: "#8b5cf6" },
+  { name: "orange", color: "#f97316" },
+  { name: "pink", color: "#ec4899" },
+  { name: "teal", color: "#14b8a6" },
+];
+
+export default function AccountTab({ user }: Props) {
   const { setUser } = useSession();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [selectedTheme, setSelectedTheme] = useState(
+    user.theme || themes[0].name,
+  );
 
   const handleAvatarUpload = async () => {
     const isSessionValid = await isValidSession();
@@ -72,6 +86,7 @@ const AccountTab: React.FC<Props> = ({ user }) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    formData.append("theme", selectedTheme);
 
     startTransition(async () => {
       try {
@@ -79,7 +94,11 @@ const AccountTab: React.FC<Props> = ({ user }) => {
         if (result.message === "User successfully updated!") {
           toast.success(result.message);
           const updatedName = formData.get("name") as string;
-          setUser({ ...user, name: updatedName });
+          setUser({
+            ...user,
+            name: updatedName,
+            theme: selectedTheme,
+          });
           router.refresh();
         } else {
           toast.error("Failed to update user");
@@ -92,9 +111,9 @@ const AccountTab: React.FC<Props> = ({ user }) => {
   };
 
   return (
-    <TabsContent value="account" className="space-y-4">
-      <Card>
-        <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
+      <TabsContent value="account" className="space-y-4">
+        <Card>
           <CardHeader>
             <CardTitle className="text-2xl">User Settings</CardTitle>
             <CardDescription>
@@ -166,15 +185,42 @@ const AccountTab: React.FC<Props> = ({ user }) => {
             </div>
             <input type="hidden" name="id" value={user.id} />
           </CardContent>
-          <CardFooter>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Save Changes"}
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
-    </TabsContent>
-  );
-};
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Preferences</CardTitle>
+            <CardDescription>
+              Customize your experience by updating theme.
+              {/* and time zone preferences. */}
+            </CardDescription>
+          </CardHeader>
 
-export default AccountTab;
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Theme</Label>
+              <div className="flex flex-wrap gap-2">
+                {themes.map((theme) => (
+                  <button
+                    key={theme.name}
+                    type="button"
+                    className={`w-8 h-8 rounded-md border-2 ${
+                      selectedTheme === theme.name
+                        ? "border-primary"
+                        : "border-transparent"
+                    }`}
+                    style={{ backgroundColor: theme.color }}
+                    onClick={() => setSelectedTheme(theme.name)}
+                    aria-label={`Select ${theme.name} theme`}
+                  />
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Saving..." : "Save Changes"}
+        </Button>
+      </TabsContent>
+    </form>
+  );
+}

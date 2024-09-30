@@ -18,9 +18,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Purchase / Transactions ?
 
-- link userId to productId
-- quantity, stripe transactionId?
-- webhook to update transactionId from stripe (if needed)
+- Product default prices
 
 ### Nice to haves
 
@@ -30,6 +28,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - documentation
   - where to get env variables
   - commands
+- remove landing page navbar links when user signed in
 
 ### Verification / Auth
 

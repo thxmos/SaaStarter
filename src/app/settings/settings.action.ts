@@ -38,8 +38,7 @@ export async function updateUser(formData: FormData) {
     const id = formData.get("id");
     const avatar = formData.get("avatar");
     const name = formData.get("name");
-    const is2faEnabled = formData.get("2faEnabled") === "true";
-    const isSubscribed = formData.get("isSubscribed") === "true";
+    const theme = formData.get("theme");
 
     if (!id || typeof id !== "string") {
       throw new Error("User ID is required");
@@ -48,10 +47,7 @@ export async function updateUser(formData: FormData) {
     const updateDto = {
       name: typeof name === "string" ? name : undefined,
       avatar: typeof avatar === "string" ? avatar : undefined,
-      // is2faEnabled:
-      //   typeof is2faEnabled === "boolean" ? is2faEnabled : undefined,
-      isSubscribed:
-        typeof isSubscribed === "boolean" ? isSubscribed : undefined,
+      theme: typeof theme === "string" ? theme : undefined,
     };
 
     const res = await prisma.user.update({
@@ -65,7 +61,7 @@ export async function updateUser(formData: FormData) {
     }
 
     console.log("User successfully updated");
-    // revalidatePath("/dashboard"); // Adjust this path as needed
+    revalidatePath("/dashboard"); // Adjust this path as needed
     return { message: "User successfully updated!", success: true };
   } catch (error) {
     console.error(error);

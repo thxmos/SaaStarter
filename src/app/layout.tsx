@@ -40,8 +40,7 @@ export default async function RootLayout({
         <SessionProvider session={session} sessionUser={user}>
           <ThemeProvider
             attribute="class"
-            // defaultTheme="system"
-            defaultTheme="bean"
+            defaultTheme={user?.theme || "bean"}
             enableSystem
             disableTransitionOnChange
           >

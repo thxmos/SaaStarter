@@ -32,15 +32,17 @@ const Navbar = () => {
         <span className="sr-only">{APP_NAME}</span>
       </Link>
       <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
-        {navLinks.map((link) => (
-          <Link
-            key={link.url}
-            className="text-sm font-medium hover:underline underline-offset-4"
-            href={link.url}
-          >
-            {link.name}
-          </Link>
-        ))}
+        {/* Unauthenticated Links*/}
+        {!user &&
+          navLinks.map((link) => (
+            <Link
+              key={link.url}
+              className="text-sm font-medium hover:underline underline-offset-4"
+              href={link.url}
+            >
+              {link.name}
+            </Link>
+          ))}
         <DropdownMenu user={user} />
         <LoginButton user={user} />
       </nav>

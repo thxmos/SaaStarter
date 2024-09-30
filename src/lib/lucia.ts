@@ -51,11 +51,10 @@ export const getUser = async () => {
       name: true,
       avatar: true,
       isVerified: true,
+      theme: true,
+      stripeCustomerId: true,
       createdAt: true,
       updatedAt: true,
-      stripeCustomerId: true,
-      stripePriceId: true,
-      isSubscribed: true,
     },
   });
 
