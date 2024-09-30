@@ -50,6 +50,8 @@ const SubscribePage = async () => {
         </header>
         <div className="flex flex-col items-center md:items-start md:justify-center gap-4 md:flex-row">
           {plans.map(async ({ price, product, features }) => {
+            if (!product || !product.active)
+              return <p>No Products Available.</p>;
             return (
               <PricingCard
                 key={product.id}
