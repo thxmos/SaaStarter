@@ -34,8 +34,6 @@ const FileUpload: React.FC<Props> = ({
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const selectedFile = acceptedFiles[0];
-    console.log(selectedFile);
-    console.log(acceptedTypes.hasOwnProperty(selectedFile.type));
     if (selectedFile && acceptedTypes.hasOwnProperty(selectedFile.type)) {
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));

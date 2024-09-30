@@ -29,6 +29,7 @@ import {
   sendResetEmail,
   signIn,
 } from "./auth.action";
+import { BeatLoader } from "react-spinners";
 
 export const signInSchema = z.object({
   email: z.string().email(),
@@ -43,6 +44,7 @@ export type SignInSchema = z.infer<typeof signInSchema>;
 export type ForgotPasswordSchema = z.infer<typeof passwordResetSchema>;
 
 const SignInForm = () => {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
@@ -62,22 +64,28 @@ const SignInForm = () => {
   });
 
   const onSignInSubmit = async (values: SignInSchema) => {
+    setLoading(true);
     const res = await signIn(values);
     if (res.success) {
       toast.success("Login successful");
       router.push("/dashboard");
+      setLoading(false);
     } else {
       toast.error(res.error);
+      setLoading(false);
     }
   };
 
   const onForgotPasswordSubmit = async (values: ForgotPasswordSchema) => {
+    setLoading(true);
     const res = await sendResetEmail(values);
     if (res.success) {
       toast.success("Reset email sent");
       setIsForgotPassword(false);
+      setLoading(false);
     } else {
       toast.error(res.error);
+      setLoading(false);
     }
   };
 
@@ -117,8 +125,8 @@ const SignInForm = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Reset Password
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? <BeatLoader size={10} /> : "Reset Password"}
               </Button>
               <Button
                 type="button"
@@ -174,8 +182,8 @@ const SignInForm = () => {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Login
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? <BeatLoader size={10} /> : "Login"}
                 </Button>
               </form>
             </Form>

@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { signUp } from "./auth.action";
+import { BeatLoader } from "react-spinners";
 
 export const signUpSchema = z
   .object({
@@ -40,6 +41,8 @@ export const signUpSchema = z
 export type SignUpSchema = z.infer<typeof signUpSchema>;
 
 const SignUpForm = () => {
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
@@ -52,12 +55,15 @@ const SignUpForm = () => {
   });
 
   const onSubmit = async (values: SignUpSchema) => {
+    setLoading(true);
     const res = await signUp(values);
     if (res.success) {
       toast.success("Account created successfully");
       router.push(`/verify-email/awaiting?email=${values.email}`);
+      setLoading(false);
     } else {
       toast.error(res.error);
+      setLoading(false);
     }
   };
 
@@ -145,8 +151,12 @@ const SignUpForm = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="self-start w-full">
-              Sign Up
+            <Button
+              type="submit"
+              className="self-start w-full"
+              disabled={loading}
+            >
+              {loading ? <BeatLoader size={10} /> : "Sign Up"}
             </Button>
           </form>
         </Form>
