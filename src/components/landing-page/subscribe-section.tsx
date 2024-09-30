@@ -1,5 +1,5 @@
+import Link from "next/link";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
 
 const SubscribeSection = () => {
   return (
@@ -14,23 +14,16 @@ const SubscribeSection = () => {
               Ready to Get Started?
             </h2>
             <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Join thousands of satisfied customers and transform your business
+              Join thousands of satisfied customers and transform your beans
               today.
             </p>
           </div>
           <div className="w-full max-w-sm space-y-2">
-            <form className="flex space-x-2">
-              <Input
-                className="flex-1"
-                placeholder="Enter your email"
-                type="email"
-              />
-              <Button type="submit">Subscribe</Button>
-            </form>
-            <p className="text-xs text-muted-foreground">
-              By subscribing, you agree to our Terms of Service and Privacy
-              Policy.
-            </p>
+            <Link href="/auth">
+              <Button className="bg-white text-black hover:bg-gray-200">
+                Get Started
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
