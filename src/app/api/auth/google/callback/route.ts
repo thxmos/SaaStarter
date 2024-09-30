@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
 
 export async function GET(req: NextRequest, res: Response) {
   const url = req.nextUrl;
@@ -55,6 +56,8 @@ export async function GET(req: NextRequest, res: Response) {
     },
   });
 
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
   if (existingUser) {
     userId = existingUser.id;
   } else {
@@ -67,6 +70,20 @@ export async function GET(req: NextRequest, res: Response) {
       },
     });
     userId = user.id;
+
+    const stripeCustomer = await stripe.customers.create({
+      email: googleData.email.toLowerCase(),
+      name: googleData.name,
+    });
+
+    if (stripeCustomer.id !== undefined) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { stripeCustomerId: stripeCustomer.id },
+      });
+    } else {
+      console.error("Failed to create Stripe customer for user", user);
+    }
   }
 
   const session = await lucia.createSession(userId, {});

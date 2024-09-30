@@ -1,6 +1,8 @@
 "use server";
 
+import { getUser } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
+import { Price } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 
@@ -98,3 +100,34 @@ export async function getPrices(active: boolean = true) {
     };
   }
 }
+
+export const createCheckoutSession = async (price: Price, quanity: number) => {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+  const { user } = await getUser();
+
+  if (!user || !user.stripeCustomerId) {
+    console.error("User not found or missing Stripe customer ID");
+    return { success: false };
+  }
+
+  const customer = await stripe.customers.retrieve(user.stripeCustomerId);
+
+  const session = await stripe.checkout.sessions.create({
+    success_url: `${process.env.NEXT_PUBLIC_URL}/dashboard`,
+    cancel_url: `${process.env.NEXT_PUBLIC_URL}/`,
+    line_items: [
+      {
+        price: price.stripePriceId!,
+        quantity: quanity,
+      },
+    ],
+    mode: "subscription",
+    customer: customer.id,
+  });
+
+  if (!session) {
+    return { success: false };
+  }
+
+  return { success: true, sessionId: session.id };
+};

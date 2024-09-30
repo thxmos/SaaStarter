@@ -1,41 +1,44 @@
-import PricingCard from "./pricing-card";
+import PricingCard from "@/components/pricing-card";
+import { prisma } from "@/lib/prisma";
+import { Price, Product } from "@prisma/client";
 
-export interface Plan {
-  link: string;
-  priceId: string;
-  price: number;
-  duration: string;
+interface Plan {
+  price: Price;
+  product: Product;
+  features: string[];
 }
 
-export const plans: Plan[] = [
-  {
-    link:
-      process.env.NODE_ENV === "development"
-        ? "https://buy.stripe.com/test_6oEcNP76Mfrj3y8aEF"
-        : "",
-    priceId:
-      process.env.NODE_ENV === "development"
-        ? "price_1Q2uZmKI5Vbl5VrudQ5KDJOl"
-        : "",
-    price: 5,
-    duration: "/month",
-  },
-  {
-    link:
-      process.env.NODE_ENV === "development"
-        ? "https://buy.stripe.com/test_9AQ157bn20wp3y8cMO"
-        : "",
-    priceId:
-      process.env.NODE_ENV === "development"
-        ? "price_1Q2ueNKI5Vbl5VruLuKDdSUy"
-        : "",
-
-    price: 99,
-    duration: "/year",
-  },
-];
-
 const SubscribePage = async () => {
+  const prices = await prisma.price.findMany();
+  const products = await prisma.product.findMany();
+
+  const plans = prices.map((price) => {
+    const product = products.find(
+      (p) => p.stripeProductId === price.stripeProductId,
+    );
+    if (!product) return null;
+
+    let features = [
+      "Feature 1",
+      "Feature 2",
+      "Feature 3",
+      "Feature 4",
+      "Feature 5",
+    ];
+
+    if (product.stripeProductId === "stripe price id") {
+      features = [];
+    }
+
+    return {
+      price,
+      product,
+      features: features,
+    };
+  }) as Plan[];
+
+  console.log(plans);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">
@@ -46,35 +49,19 @@ const SubscribePage = async () => {
           </p>
         </header>
         <div className="flex flex-col items-center md:items-start md:justify-center gap-4 md:flex-row">
-          <PricingCard
-            plan={plans[0]}
-            title="Monthly Plan"
-            price="$29"
-            period="per month"
-            features={[
-              "All Monthly Plan features",
-              "2 months free",
-              "Up to 20 team members",
-              "25GB storage",
-              "Priority support",
-            ]}
-            ctaText="Start Monthly Plan"
-          />
-          <PricingCard
-            plan={plans[1]}
-            title="Yearly Plan"
-            price="$290"
-            period="per year"
-            features={[
-              "All Monthly Plan features",
-              "2 months free",
-              "Up to 20 team members",
-              "25GB storage",
-              "Priority support",
-            ]}
-            ctaText="Start Yearly Plan"
-            highlighted={true}
-          />
+          {plans.map(async ({ price, product, features }) => {
+            if (!product || !product.active)
+              return <p>No Products Available.</p>;
+            return (
+              <PricingCard
+                key={product.id}
+                product={product}
+                price={price}
+                features={features}
+                highlighted
+              />
+            );
+          })}
         </div>
       </div>
     </div>
