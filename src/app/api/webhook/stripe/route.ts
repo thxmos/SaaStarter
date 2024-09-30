@@ -28,130 +28,88 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (eventType) {
-      case "product.created":
-        {
-          const product = data.object as Stripe.Product;
+      case "product.updated": {
+        const product = data.object as Stripe.Product;
+        if (!product) return;
+        const upsert = await prisma.product.upsert({
+          where: { stripeProductId: product.id },
+          create: {
+            name: product.name,
+            description: product.description,
+            image: product.images[0],
+            active: product.active,
+            stripeProductId: product.id,
+            metadata: product.metadata,
+          },
+          update: {
+            name: product.name,
+            description: product.description,
+            image: product.images[0],
+            active: product.active,
+            metadata: product.metadata,
+            stripeProductId: product.id,
+          },
+        });
 
-          const res = await prisma.product.create({
-            data: {
-              name: product.name,
-              description: product.description,
-              image: product.images[0],
-              active: product.active,
-              stripeProductId: product.id.toString(),
-              // prices: product. // is prices a property of the product object? maybe we need another object instead of products
-            },
-          });
-
-          if (!res) {
-            console.error("Error creating product", product);
-            throw new Error("Error creating product");
-          }
-        }
         break;
+      }
 
-      case "product.deleted":
-        {
-          const product = data.object as Stripe.Product;
-
-          const res = await prisma.product.delete({
-            where: {
-              stripeProductId: product.id.toString(),
-            },
-          });
-
-          if (!res) {
-            console.error("Error deleting product", product);
-            throw new Error("Error deleting product");
-          }
-        }
+      case "product.deleted": {
+        const product = data.object as Stripe.Product;
+        if (!product) return;
+        const res = await prisma.product.delete({
+          where: { stripeProductId: product.id },
+        });
         break;
+      }
 
-      case "product.updated":
-        {
-          const product = data.object as Stripe.Product;
-
-          console.log(product);
-
-          const existingProduct = await prisma.product.findUnique({
-            where: {
-              stripeProductId: product.id.toString(),
+      case "price.updated": {
+        const price = data.object as Stripe.Price;
+        if (!price) return;
+        const upsert = await prisma.price.upsert({
+          where: { stripePriceId: price.id },
+          create: {
+            stripePriceId: price.id.toString(),
+            stripeProductId: price.product.toString(),
+            active: price.active,
+            unitAmount: price.unit_amount,
+            currency: price.currency,
+            type: price.type.toUpperCase() as PricingType,
+            interval:
+              price.recurring?.interval.toUpperCase() as PricingPlanInterval,
+            trialPeriodDays: price.recurring?.trial_period_days,
+            metadata: price.metadata,
+            product: {
+              connect: { stripeProductId: price.product.toString() },
             },
-          });
-
-          if (existingProduct) {
-            const res = await prisma.product.update({
-              where: {
-                stripeProductId: product.id.toString(),
-              },
-              data: {
-                name: product.name,
-                description: product.description,
-                image: product.images[0],
-                active: product.active,
-              },
-            });
-          } else {
-            const res = await prisma.product.create({
-              data: {
-                name: product.name,
-                description: product.description,
-                image: product.images[0],
-                active: product.active,
-                stripeProductId: product.id.toString(),
-              },
-            });
-
-            if (!res) {
-              console.error("Error upserting product", product);
-              throw new Error("Error upserting product");
-            }
-          }
-        }
-        break;
-
-      case "price.created":
-        {
-          const price = data.object as Stripe.Price;
-
-          const res = await prisma.price.create({
-            data: {
-              stripePriceId: price.id.toString(),
-              stripeProductId: price.product.toString(),
-              active: price.active,
-              unitAmount: price.unit_amount,
-              currency: price.currency,
-              type: price.type.toUpperCase() as PricingType,
-              interval:
-                price.recurring?.interval.toUpperCase() as PricingPlanInterval,
-              trialPeriodDays: price.recurring?.trial_period_days,
-              metadata: price.metadata,
+          },
+          update: {
+            stripePriceId: price.id.toString(),
+            stripeProductId: price.product.toString(),
+            active: price.active,
+            unitAmount: price.unit_amount,
+            currency: price.currency,
+            type: price.type.toUpperCase() as PricingType,
+            interval:
+              price.recurring?.interval.toUpperCase() as PricingPlanInterval,
+            trialPeriodDays: price.recurring?.trial_period_days,
+            metadata: price.metadata,
+            product: {
+              connect: { stripeProductId: price.product.toString() },
             },
-          });
-
-          if (!res) {
-            console.error("Error creating price", price);
-            throw new Error("Error creating price");
-          }
-        }
+          },
+        });
         break;
+      }
 
-      case "price.deleted":
-        {
-          const price = data.object as Stripe.Price;
-
-          const res = await prisma.price.delete({
-            where: {
-              stripePriceId: price.id.toString(),
-            },
-          });
-
-          if (!res) {
-            console.error("Error deleting price", price);
-            throw new Error("Error deleting price");
-          }
-        }
+      case "price.deleted": {
+        const price = data.object as Stripe.Price;
+        if (!price) return;
+        const res = await prisma.price.delete({
+          where: { stripePriceId: price.id },
+        });
         break;
+      }
 
       case "checkout.session.completed": {
         const checkout = data.object as Stripe.Checkout.Session;
@@ -176,6 +134,11 @@ export async function POST(req: NextRequest) {
                 email: customer.email,
                 name: customer.name,
                 stripeCustomerId: customer.id,
+                subscriptions: {
+                  connect: {
+                    stripePriceId: priceId,
+                  },
+                },
               },
             });
           }
@@ -190,6 +153,11 @@ export async function POST(req: NextRequest) {
             stripePriceId: priceId,
             isSubscribed: true,
             stripeCustomerId: customer.id,
+            subscriptions: {
+              connect: {
+                stripePriceId: priceId,
+              },
+            },
           },
         });
 
@@ -208,7 +176,11 @@ export async function POST(req: NextRequest) {
         await prisma.user.update({
           where: { id: user.id },
           data: {
-            isSubscribed: false,
+            subscriptions: {
+              disconnect: {
+                stripePriceId: subscription.items.data[0].price.id,
+              },
+            },
           },
         });
 

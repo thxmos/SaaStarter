@@ -8,10 +8,10 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(cuid())
-  email      String   @unique
-  name       String?
-  // role     UserRole @default(USER)
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
+
   password   String?
   avatar     String?
   isVerified Boolean  @default(false)
@@ -19,17 +19,10 @@ model User {
   updatedAt  DateTime @updatedAt
 
   stripeCustomerId String? @unique
-  stripePriceId    String?
-  isSubscribed     Boolean @default(false)
 
   session       Session[]
-  // subscriptions Price[]   @relation("UserSubscriptions")
+  subscriptions Price[]   @relation("UserSubscriptions")
 }
-
-// enum UserRole {
-//   USER
-//   ADMIN
-// }
 
 model Session {
   id        String   @id
@@ -68,20 +61,21 @@ model Price {
   trialPeriodDays Int?                 @map("trial_period_days")
   metadata        Json?
 
-  // product Product? @relation(fields: [productId], references: [id])
-  // users   User[]   @relation("UserSubscriptions")
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+  users     User[]   @relation("UserSubscriptions")
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String?
-  description String?
-  image       String?
-  active      Boolean?
-  metadata    Json?
-  stripeProductId String? @unique
+  id              String   @id @default(cuid())
+  name            String?
+  description     String?
+  image           String?
+  active          Boolean?
+  metadata        Json?
+  stripeProductId String?  @unique
 
-  // prices Price[]
+  prices Price[]
 }
 
 enum PricingType {
