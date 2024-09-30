@@ -25,18 +25,17 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ### Nice to haves
 
 - users can set theme in profile (save in preferences cookie)
-- make avatar dropdown close on click
 - button disable on email resend, login, sign up
 - allow users to view actual stripe billing data from account settings
 - documentation
   - where to get env variables
   - commands
-- session is not refreshed when user signs it so it brings them to "/"
+- session is not refreshed when user signs it so it redirects to "/dashboard" then "/" \*
 
 ### Verification / Auth
 
 - verify different devices / location
-- create cookie and log the user in after they verify their email
+- create cookie and log the user in after they verify their email \*
 - redirect only routes
 - 2fa enablement
 
