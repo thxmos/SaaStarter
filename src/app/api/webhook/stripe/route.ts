@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { PricingPlanInterval, PricingType } from "@prisma/client";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
@@ -105,6 +106,49 @@ export async function POST(req: NextRequest) {
               console.error("Error upserting product", product);
               throw new Error("Error upserting product");
             }
+          }
+        }
+        break;
+
+      case "price.created":
+        {
+          const price = data.object as Stripe.Price;
+
+          const res = await prisma.price.create({
+            data: {
+              stripePriceId: price.id.toString(),
+              stripeProductId: price.product.toString(),
+              active: price.active,
+              unitAmount: price.unit_amount,
+              currency: price.currency,
+              type: price.type.toUpperCase() as PricingType,
+              interval:
+                price.recurring?.interval.toUpperCase() as PricingPlanInterval,
+              trialPeriodDays: price.recurring?.trial_period_days,
+              metadata: price.metadata,
+            },
+          });
+
+          if (!res) {
+            console.error("Error creating price", price);
+            throw new Error("Error creating price");
+          }
+        }
+        break;
+
+      case "price.deleted":
+        {
+          const price = data.object as Stripe.Price;
+
+          const res = await prisma.price.delete({
+            where: {
+              stripePriceId: price.id.toString(),
+            },
+          });
+
+          if (!res) {
+            console.error("Error deleting price", price);
+            throw new Error("Error deleting price");
           }
         }
         break;
