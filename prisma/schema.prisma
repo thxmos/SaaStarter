@@ -79,6 +79,7 @@ model Product {
   description String?
   image       String?
   metadata    Json?
+  stripeProductId String? @unique
 
   prices Price[]
 }

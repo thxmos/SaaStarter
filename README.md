@@ -49,6 +49,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - dont make server actions ingest forms, process forms from client components
 - layout to prevent page scrolling when unecessary
+- clean error handling, let some things silently fail and have good error logs
+- dont need to store as much info in product maybe just the ids, make stripe actions to access needed data
 
 ### Theme Gen
 

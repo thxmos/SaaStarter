@@ -27,9 +27,87 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (eventType) {
-      case "product.created": {
-        const product = data.object as Stripe.Product;
-      }
+      case "product.created":
+        {
+          const product = data.object as Stripe.Product;
+
+          const res = await prisma.product.create({
+            data: {
+              name: product.name,
+              description: product.description,
+              image: product.images[0],
+              active: product.active,
+              stripeProductId: product.id.toString(),
+              // prices: product. // is prices a property of the product object? maybe we need another object instead of products
+            },
+          });
+
+          if (!res) {
+            console.error("Error creating product", product);
+            throw new Error("Error creating product");
+          }
+        }
+        break;
+
+      case "product.deleted":
+        {
+          const product = data.object as Stripe.Product;
+
+          const res = await prisma.product.delete({
+            where: {
+              stripeProductId: product.id.toString(),
+            },
+          });
+
+          if (!res) {
+            console.error("Error deleting product", product);
+            throw new Error("Error deleting product");
+          }
+        }
+        break;
+
+      case "product.updated":
+        {
+          const product = data.object as Stripe.Product;
+
+          console.log(product);
+
+          const existingProduct = await prisma.product.findUnique({
+            where: {
+              stripeProductId: product.id.toString(),
+            },
+          });
+
+          if (existingProduct) {
+            const res = await prisma.product.update({
+              where: {
+                stripeProductId: product.id.toString(),
+              },
+              data: {
+                name: product.name,
+                description: product.description,
+                image: product.images[0],
+                active: product.active,
+              },
+            });
+          } else {
+            const res = await prisma.product.create({
+              data: {
+                name: product.name,
+                description: product.description,
+                image: product.images[0],
+                active: product.active,
+                stripeProductId: product.id.toString(),
+              },
+            });
+
+            if (!res) {
+              console.error("Error upserting product", product);
+              throw new Error("Error upserting product");
+            }
+          }
+        }
+        break;
 
       case "checkout.session.completed": {
         const checkout = data.object as Stripe.Checkout.Session;
