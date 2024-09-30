@@ -16,16 +16,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODOS:
 
-### Purchase / Transactions ?
-
-- link userId to productId
-- quantity, stripe transactionId?
-- webhook to update transactionId from stripe (if needed)
-
 ### Nice to haves
 
 - users can set theme in profile (save in preferences cookie)
-- button disable on email resend, login, sign up
 - allow users to view actual stripe billing data from account settings
 - documentation
   - where to get env variables
