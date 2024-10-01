@@ -136,6 +136,10 @@ export const signIn = async (values: SignInSchema) => {
     );
     if (!passwordMatch) return { error: "Invalid Credentials", success: false };
 
+    if (!user.isVerified) {
+      return { error: "Please verify your email to login.", success: false };
+    }
+
     const session = await lucia.createSession(user.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
     cookies().set(
