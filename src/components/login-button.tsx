@@ -1,7 +1,5 @@
 "use client";
 
-import { logout } from "@/app/auth/auth.action";
-import { Button } from "./ui/button";
 import Link from "next/link";
 
 interface Props {

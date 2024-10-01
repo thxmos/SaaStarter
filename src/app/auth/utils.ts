@@ -13,11 +13,13 @@ export const sendPasswordResetEmail = async (
 ) => {
   const verificationUrl = `${process.env.NEXT_PUBLIC_URL}/reset-password?token=${token}`;
 
-  //TODO: generic email send method
-  // if dev use onboarding email
+  const fromEmail =
+    process.env.NODE_ENV === "production"
+      ? "onboarding@resend.dev"
+      : `${APP_NAME} <no-reply@${process.env.NEXT_PUBLIC_URL}>`;
+
   const res = await resend.emails.send({
-    // from: `${APP_NAME} <no-reply@${process.env.NEXT_PUBLIC_URL}>`,
-    from: "onboarding@resend.dev",
+    from: fromEmail,
     to: email,
     subject: `Password Reset - ${APP_NAME}`,
     react: PasswordResetEmail({ url: verificationUrl, name: name }),

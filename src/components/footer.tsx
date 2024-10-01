@@ -1,5 +1,4 @@
 import { APP_NAME } from "@/constants";
-import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -7,20 +6,6 @@ const Footer = () => {
       <p className="text-xs text-muted-foreground">
         © 2023 {APP_NAME} Inc. All rights reserved.
       </p>
-      {/* <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-        <Link
-          className="text-xs hover:underline underline-offset-4"
-          href="/error"
-        >
-          Terms of Service
-        </Link>
-        <Link
-          className="text-xs hover:underline underline-offset-4"
-          href="/error"
-        >
-          Privacy
-        </Link>
-      </nav> */}
     </footer>
   );
 };

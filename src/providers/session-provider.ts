@@ -2,7 +2,7 @@
 
 import { User } from "@/types/user";
 import { Session } from "lucia";
-import React, { createElement, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { createContext, ReactNode } from "react";
 
 interface SessionContextType {

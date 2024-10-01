@@ -1,8 +1,7 @@
-import { Lucia, Session } from "lucia";
+import { Lucia } from "lucia";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { prisma } from "./prisma";
 import { cookies } from "next/headers";
-import { User } from "@/types/user";
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
@@ -41,24 +40,27 @@ export const getUser = async () => {
         sessionCookie.attributes,
       );
     }
-  } catch (error) {}
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user?.id },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      avatar: true,
-      isVerified: true,
-      theme: true,
-      stripeCustomerId: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user?.id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        avatar: true,
+        isVerified: true,
+        theme: true,
+        stripeCustomerId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
 
-  return { user: dbUser, session: session };
+    return { user: dbUser, session: session };
+  } catch (error) {
+    console.error(error);
+    return { user: null, session: null };
+  }
 };
 
 declare module "lucia" {

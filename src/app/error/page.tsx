@@ -27,9 +27,9 @@ export default function NotFound() {
           </p>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Button asChild>
-            <Link href="/">Return to Home</Link>
-          </Button>
+          <Link href="/">
+            <Button asChild>Return to Home</Button>
+          </Link>
         </CardFooter>
       </Card>
     </div>

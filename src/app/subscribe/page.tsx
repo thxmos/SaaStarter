@@ -1,4 +1,5 @@
 import PricingCard from "@/components/pricing-card";
+import { APP_NAME } from "@/constants";
 import { prisma } from "@/lib/prisma";
 import { Price, Product } from "@prisma/client";
 
@@ -37,13 +38,11 @@ const SubscribePage = async () => {
     };
   }) as Plan[];
 
-  console.log(plans);
-
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16">
         <header className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-300 mb-4">SuperSaaS</h1>
+          <h1 className="text-4xl font-bold text-gray-300 mb-4">{APP_NAME}</h1>
           <p className="text-xl text-gray-400">
             Boost your productivity with our amazing tools
           </p>

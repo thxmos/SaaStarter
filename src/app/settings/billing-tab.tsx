@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,14 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Download } from "lucide-react";
-import { toast } from "sonner";
 import { useSession } from "@/providers/session-provider";
 import Link from "next/link";
-
-import { updateUser } from "./settings.action";
-import { getSubscriptions } from "@/actions/stripe.actions";
 
 interface Props {
   user: any;
