@@ -39,17 +39,18 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Verification / Auth
 
-- verify different devices / location
-- create cookie and log the user in after they verify their email \*
-- 2fa enablement
-- look into what revalidate path does
+- Location Verification
+  - verify different devices / location from the first signed up device
+  - 2fa enablement
 
 ### Refactor / Clean up
 
-- dont make server actions ingest forms, process forms from client components
-- clean error handling, let some things silently fail and have good error logs
-- dont need to store as much info in product maybe just the ids, make stripe actions to access needed data (actually maybe itd be good to have if moving to another platform and wanting to keep prod data)
-- move all stripe webhooks into helper function files? products.helpers.ts, prices.helpers.ts or something more modular
+- Form Update
+  - look into best way to do forms
+  - dont make server actions ingest forms, process forms from client components
+  - dont need to store as much info in product maybe just the ids, make stripe actions to access needed data (actually maybe itd be good to have if moving to another platform and wanting to keep prod data)
+- Stripe Webhook Helper Functions
+  - move all stripe webhooks into helper function files? products.helpers.ts, prices.helpers.ts or something more modular
 
 ### Theme Gen
 
