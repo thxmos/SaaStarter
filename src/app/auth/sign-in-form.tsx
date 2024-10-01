@@ -24,68 +24,54 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  getGoogleOauthConsentUrl,
-  sendResetEmail,
-  signIn,
-} from "./auth.action";
+import { getGoogleOauthConsentUrl, signIn } from "./auth.action";
 import { BeatLoader } from "react-spinners";
+import ForgotPasswordForm from "./forgot-password-form";
 
-export const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
-
-export const passwordResetSchema = z.object({
-  email: z.string().email(),
+const signInSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export type SignInSchema = z.infer<typeof signInSchema>;
-export type ForgotPasswordSchema = z.infer<typeof passwordResetSchema>;
 
 const SignInForm = () => {
-  const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResetPassword, setIsResetPassword] = useState(false);
   const router = useRouter();
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
-  const signInForm = useForm<SignInSchema>({
+  const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
-  const forgotPasswordForm = useForm<ForgotPasswordSchema>({
-    resolver: zodResolver(passwordResetSchema),
-    defaultValues: {
-      email: "",
-    },
-  });
-
-  const onSignInSubmit = async (values: SignInSchema) => {
-    setLoading(true);
-    const res = await signIn(values);
-    if (res.success) {
-      toast.success("Login successful");
-      router.push("/dashboard");
-      setLoading(false);
-    } else {
-      toast.error(res.error);
-      setLoading(false);
+  const onSubmit = async (values: SignInSchema) => {
+    setIsSubmitting(true);
+    try {
+      const res = await signIn(values);
+      if (res.success) {
+        toast.success("Login successful");
+        router.push("/dashboard");
+      } else {
+        toast.error(res.error || "Login failed");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const onForgotPasswordSubmit = async (values: ForgotPasswordSchema) => {
-    setLoading(true);
-    const res = await sendResetEmail(values);
-    if (res.success) {
-      toast.success("Reset email sent");
-      setIsForgotPassword(false);
-      setLoading(false);
-    } else {
-      toast.error(res.error);
-      setLoading(false);
+  const handleGoogleSignIn = async () => {
+    try {
+      const res = await getGoogleOauthConsentUrl();
+      if (res.url) {
+        window.location.href = res.url;
+      } else {
+        toast.error(res.error || "Failed to get Google sign-in URL");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
     }
   };
 
@@ -93,23 +79,22 @@ const SignInForm = () => {
     <Card className="min-w-[400px]">
       <CardHeader>
         <CardTitle>
-          {isForgotPassword ? "Reset Password" : "Welcome back!"}
+          {isResetPassword ? "Reset Password" : "Welcome back!"}
         </CardTitle>
         <CardDescription>
-          {isForgotPassword
+          {isResetPassword
             ? "Enter your email to reset your password."
             : "Sign in to your account to continue."}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {isForgotPassword ? (
-          <Form {...forgotPasswordForm}>
-            <form
-              className="flex flex-col gap-4"
-              onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)}
-            >
+        {isResetPassword ? (
+          <ForgotPasswordForm setIsResetPassword={setIsResetPassword} />
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
-                control={forgotPasswordForm.control}
+                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -125,72 +110,36 @@ const SignInForm = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? <BeatLoader size={10} /> : "Reset Password"}
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setIsForgotPassword(false)}
-              >
-                Back to Sign In
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter your password..."
+                        {...field}
+                        onChange={(e) => field.onChange(e.target.value.trim())}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <BeatLoader size={10} color="white" />
+                ) : (
+                  "Login"
+                )}
               </Button>
             </form>
-          </Form>
-        ) : (
-          <>
-            <Form {...signInForm}>
-              <form
-                className="flex flex-col gap-4"
-                onSubmit={signInForm.handleSubmit(onSignInSubmit)}
-              >
-                <FormField
-                  control={signInForm.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="Enter your email..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={signInForm.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="Enter your password..."
-                          {...field}
-                          onChange={(e) => {
-                            e.target.value = e.target.value.trim();
-                            field.onChange(e);
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? <BeatLoader size={10} /> : "Login"}
-                </Button>
-              </form>
-            </Form>
             <Button
               variant="link"
-              className="p-0 h-auto font-normal"
-              onClick={() => setIsForgotPassword(true)}
+              className="p-0 h-auto font-normal w-full"
+              onClick={() => setIsResetPassword(true)}
             >
               Forgot Password? Click here to reset
             </Button>
@@ -204,23 +153,15 @@ const SignInForm = () => {
                 </span>
               </div>
             </div>
-            <div className="w-full flex flex-col gap-4">
-              <Button
-                onClick={async () => {
-                  const res = await getGoogleOauthConsentUrl();
-                  if (res.url) {
-                    window.location.href = res.url;
-                  } else {
-                    toast.error(res.error);
-                  }
-                }}
-                variant="secondary"
-              >
-                <RiGoogleFill className="w-4 h-4 mr-2" />
-                <p>Google</p>
-              </Button>
-            </div>
-          </>
+            <Button
+              onClick={handleGoogleSignIn}
+              variant="secondary"
+              className="w-full"
+            >
+              <RiGoogleFill className="w-4 h-4 mr-2" />
+              Google
+            </Button>
+          </Form>
         )}
       </CardContent>
     </Card>

@@ -1,9 +1,8 @@
-"use client";
-
 import { Parallax } from "react-parallax";
 import { Button } from "@/components/ui/button";
 import heroBgPic from "@/assets/hero-bg.jpg";
 import { APP_NAME } from "@/constants";
+import Link from "next/link";
 
 export default function Component() {
   return (
@@ -25,15 +24,11 @@ export default function Component() {
               </p>
             </div>
             <div className="space-x-4">
-              <Button className="bg-white text-black hover:bg-gray-200">
-                Get Started
-              </Button>
-              {/* <Button
-                variant="outline"
-                className="text-white border-white hover:bg-white/10"
-              >
-                Learn More
-              </Button> */}
+              <Link href="/auth">
+                <Button className="bg-white text-black hover:bg-gray-200">
+                  Get Started
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

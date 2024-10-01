@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,20 +15,9 @@ import {
 } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { resetPassword } from "../auth/auth.action";
 
-async function resetPassword(token: string, password: string) {
-  try {
-    await fetch("/api/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, password }),
-    });
-    return { success: true };
-  } catch (error) {
-    console.error(error);
-    return { success: false };
-  }
-}
+// ERROR HANDLING button stays frozen, but needs to be better in general, don't use usestate for form values
 
 export default function PasswordResetPage() {
   const [password, setPassword] = useState("");
@@ -45,13 +34,12 @@ export default function PasswordResetPage() {
     if (tokenFromUrl) {
       setToken(tokenFromUrl);
     } else {
-      setError("Invalid or missing reset token");
+      redirect("/auth");
     }
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     if (password !== confirmPassword) {
@@ -67,22 +55,22 @@ export default function PasswordResetPage() {
     }
 
     try {
-      const result = await resetPassword(token, password);
-      if (result.success) {
+      const res = await resetPassword(token, password);
+      if (res.success) {
         setSuccess(true);
       } else {
+        setIsLoading(false);
         setError("Failed to reset password. Please try again.");
       }
     } catch (err) {
+      setIsLoading(false);
       setError("An error occurred. Please try again later.");
     }
-
-    setIsLoading(false);
   };
 
   if (success) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="flex items-center justify-center min-h-screen">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>Password Reset Successful</CardTitle>
@@ -107,7 +95,7 @@ export default function PasswordResetPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Reset Your Password</CardTitle>

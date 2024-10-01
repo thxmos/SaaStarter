@@ -20,6 +20,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - Product default prices
 
+- isVerified access restriction
+
 ### Nice to haves
 
 - users can set theme in profile (save in preferences cookie)
@@ -27,7 +29,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - documentation
   - where to get env variables
   - commands
-- remove landing page navbar links when user signed in
+- Reset Password Form nicer (what is the proper way to set up these forms, right now its a free for all across them)
 
 ### Verification / Auth
 

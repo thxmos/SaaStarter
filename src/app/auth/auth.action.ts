@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Argon2id } from "oslo/password";
 import { lucia } from "@/lib/lucia";
 import { cookies } from "next/headers";
-import { ForgotPasswordSchema, SignInSchema } from "./sign-in-form";
+import { SignInSchema } from "./sign-in-form";
 import { redirect } from "next/navigation";
 import { generateCodeVerifier, generateState } from "arctic";
 import { googleOAuthClient } from "@/lib/googleOauth";
@@ -14,13 +14,8 @@ import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
 import { createPasswordResetToken, sendPasswordResetEmail } from "./utils";
 import { Stripe } from "stripe";
 
-export const sendResetEmail = async (values: ForgotPasswordSchema) => {
+export const sendResetEmail = async (email: string) => {
   try {
-    const { email } = values;
-    if (!email) {
-      return { error: "Email is required", status: 400 };
-    }
-
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return { error: "User not found", status: 404 };
@@ -204,3 +199,41 @@ export const getGoogleOauthConsentUrl = async () => {
     return { error: "Something went wrong", success: false };
   }
 };
+
+export async function resetPassword(token: string, password: string) {
+  try {
+    if (!token || typeof token !== "string") {
+      return { message: "Invalid token", success: false };
+    }
+
+    if (!password || typeof password !== "string") {
+      return { message: "Invalid password", success: false };
+    }
+
+    const hashedPassword = await new Argon2id().hash(password);
+
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+    });
+
+    if (!resetToken || new Date() > resetToken.expiresAt) {
+      return { message: "Token is invalid or has expired", success: false };
+    }
+
+    await prisma.user.update({
+      where: { id: resetToken.userId },
+      data: { password: hashedPassword },
+    });
+
+    await prisma.passwordResetToken.delete({
+      where: { id: resetToken.id },
+    });
+
+    // revalidatePath("/dashboard");
+
+    return { message: "Password successfully reset!", success: true };
+  } catch (error) {
+    console.error(error);
+    return { message: "Something went wrong", success: false };
+  }
+}
