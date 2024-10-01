@@ -61,7 +61,6 @@ export async function updateUser(formData: FormData) {
     }
 
     console.log("User successfully updated");
-    revalidatePath("/dashboard"); // Adjust this path as needed
     return { message: "User successfully updated!", success: true };
   } catch (error) {
     console.error(error);
@@ -105,8 +104,6 @@ export async function passwordReset(formData: FormData, userId: string) {
       where: { id: userId },
       data: { password: hashedPassword },
     });
-
-    revalidatePath(`/dashboard/*`);
 
     return { success: true, message: "Password updated successfully" };
   } catch (error) {

@@ -2,7 +2,6 @@
 
 import { getUser } from "@/lib/lucia";
 import { Price } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 
 export interface Subscription {
@@ -26,14 +25,10 @@ export async function getPrices(active: boolean = true) {
       expand: ["data.product"], // This will include the associated product details
     });
 
-    // Revalidate the path to ensure fresh data on the client
-    revalidatePath("/*");
-
     return {
       success: true,
       prices: prices.data.map((price) => ({
         id: price.id,
-        // productName: price.product.name,
         unitAmount: price.unit_amount,
         currency: price.currency,
         type: price.type,
