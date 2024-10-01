@@ -1,12 +1,13 @@
 import { cache } from "react";
 import { authCheck } from "./auth-check";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 
-export const createProduct = async (data: any) => {
+export const createProduct = async (options: Prisma.ProductCreateArgs) => {
   try {
     authCheck();
     const createdProduct = await prisma.product.create({
-      data,
+      ...options,
     });
     return createdProduct;
   } catch (error) {
@@ -15,37 +16,40 @@ export const createProduct = async (data: any) => {
   }
 };
 
-export const findProducts = cache(async () => {
-  try {
-    authCheck();
-    const foundProducts = await prisma.product.findMany();
-    return foundProducts;
-  } catch (error) {
-    console.error(`Failed to find products`, error);
-    return { error: "Failed to fetch products" };
-  }
-});
+export const findProducts = cache(
+  async (options: Prisma.ProductFindManyArgs) => {
+    try {
+      authCheck();
+      const foundProducts = await prisma.product.findMany({ ...options });
+      return foundProducts;
+    } catch (error) {
+      console.error(`Failed to find products`, error);
+      return { error: "Failed to fetch products" };
+    }
+  },
+);
 
-export const findProductById = cache(async (productId: string) => {
-  try {
-    authCheck();
-    const foundProduct = await prisma.product.findUnique({
-      where: { id: productId },
-    });
-    if (!foundProduct) return { error: "Product not found" };
-    return foundProduct;
-  } catch (error) {
-    console.error(`Failed to find user with id ${productId}`, error);
-    return { error: "Failed to fetch product" };
-  }
-});
+export const findUniqueProduct = cache(
+  async (options: Prisma.ProductFindUniqueArgs) => {
+    try {
+      authCheck();
+      const foundProduct = await prisma.product.findUnique({
+        ...options,
+      });
+      if (!foundProduct) return { error: "Product not found" };
+      return foundProduct;
+    } catch (error) {
+      console.error("Failed to find user", options, error);
+      return { error: "Failed to fetch product" };
+    }
+  },
+);
 
-export const updateProduct = async (productId: string, data: any) => {
+export const updateProduct = async (options: Prisma.ProductUpdateArgs) => {
   try {
     authCheck();
     const updatedProduct = await prisma.product.update({
-      where: { id: productId },
-      data,
+      ...options,
     });
     if (!updatedProduct) return { error: "Product not found" };
     return updatedProduct;
@@ -55,11 +59,11 @@ export const updateProduct = async (productId: string, data: any) => {
   }
 };
 
-export const deleteProduct = async (productId: string) => {
+export const deleteProduct = async (options: Prisma.ProductDeleteArgs) => {
   try {
     authCheck();
     const deletedProduct = await prisma.product.delete({
-      where: { id: productId },
+      ...options,
     });
     if (!deletedProduct) return { error: "Product not found" };
     return deletedProduct;
