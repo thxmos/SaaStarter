@@ -14,10 +14,10 @@ import { Label } from "@/components/ui/label";
 import React, { useTransition, useRef } from "react";
 import { toast } from "sonner";
 import { passwordReset } from "./settings.action";
+import { revalidatePath } from "next/cache";
 
 interface User {
   id: string;
-  // is2faEnabled: boolean;
 }
 
 interface Props {
@@ -26,7 +26,6 @@ interface Props {
 
 export default function SecurityTab({ user }: Props) {
   const [isPending, startTransition] = useTransition();
-  // const [is2faEnabled, setIs2faEnabled] = useState(user.is2faEnabled);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -49,31 +48,7 @@ export default function SecurityTab({ user }: Props) {
     });
   };
 
-  // const handle2faToggle = (checked: boolean) => {
-  //   startTransition(async () => {
-  //     try {
-  //       const formData = new FormData();
-  //       formData.append("id", user.id);
-  //       formData.append("is2faEnabled", checked.toString());
-
-  //       const result = await updateUser(formData);
-
-  //       if (result.success) {
-  //         console.log("2FA status updated");
-  //         setIs2faEnabled(checked);
-  //         toast.success(
-  //           `Two-factor authentication ${checked ? "enabled" : "disabled"}`,
-  //         );
-  //       } else {
-  //         console.log("Error updating 2FA status:", result.message);
-  //         throw new Error(result.message);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error updating 2FA status:", error);
-  //       toast.error("Couldn't update two-factor authentication status");
-  //     }
-  //   });
-  // };
+  revalidatePath("/settings");
 
   return (
     <>
@@ -143,27 +118,6 @@ export default function SecurityTab({ user }: Props) {
           </CardFooter>
         </form>
       </Card>
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>Two-Factor Authentication</CardTitle>
-          <CardDescription>
-            Add an extra layer of security to your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="2fa"
-              checked={is2faEnabled}
-              onCheckedChange={handle2faToggle}
-              disabled={isPending}
-            />
-            <Label htmlFor="2fa">
-              {isPending ? "Updating..." : "Enable Two-Factor Authentication"}
-            </Label>
-          </div>
-        </CardContent>
-      </Card> */}
     </>
   );
 }

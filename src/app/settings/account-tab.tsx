@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -29,16 +28,11 @@ import FileUpload, { FileType } from "@/components/file-upload";
 import { uploadBlob } from "@/actions/blob.actions";
 import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
 import { useSession } from "@/providers/session-provider";
-import { updateUser } from "./settings.action";
-import { User } from "@/types/user";
 import { getInitials } from "@/helpers";
-
-interface Props {
-  user: User;
-}
+import { updateUser } from "@/data-access/user";
 
 const themes = [
-  { name: "bight", color: "#ffffff" },
+  { name: "light", color: "#ffffff" },
   { name: "dark", color: "#1f2937" },
   { name: "blue", color: "#3b82f6" },
   { name: "green", color: "#10b981" },
@@ -48,15 +42,17 @@ const themes = [
   { name: "teal", color: "#14b8a6" },
 ];
 
-export default function AccountTab({ user }: Props) {
-  const { setUser } = useSession();
+export default function AccountTab() {
+  const { user, session } = useSession();
+  if (!user || !session) redirect("/");
+
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [selectedTheme, setSelectedTheme] = useState(
-    user.theme || themes[0].name,
+    user?.theme || themes[0].name,
   );
 
   const handleAvatarUpload = async () => {
@@ -76,7 +72,7 @@ export default function AccountTab({ user }: Props) {
       setIsUploadingAvatar(false);
       router.refresh();
       setIsModalOpen(false);
-      setUser({ ...user, avatar: blob.url });
+      await updateUser(user.id, { avatar: blob.url });
     } else {
       setIsUploadingAvatar(false);
       toast.error("Failed to upload avatar");
@@ -85,6 +81,9 @@ export default function AccountTab({ user }: Props) {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const isSessionValid = await isValidSession();
+    if (!isSessionValid) return;
+
     const formData = new FormData(event.currentTarget);
     formData.append("theme", selectedTheme);
 
