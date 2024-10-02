@@ -3,6 +3,13 @@ import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { prisma } from "./prisma";
 import { cookies } from "next/headers";
 
+export interface SessionUser {
+  id: string;
+  name: string;
+  avatar: string;
+  theme: string;
+}
+
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
 export const lucia = new Lucia(adapter, {
@@ -45,18 +52,13 @@ export const getUser = async () => {
       where: { id: user?.id },
       select: {
         id: true,
-        email: true,
         name: true,
         avatar: true,
-        isVerified: true,
         theme: true,
-        stripeCustomerId: true,
-        createdAt: true,
-        updatedAt: true,
       },
     });
 
-    return { user: dbUser, session: session };
+    return { user: dbUser as SessionUser, session: session };
   } catch (error) {
     console.error(error);
     return { user: null, session: null };
