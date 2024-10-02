@@ -1,3 +1,5 @@
+"use client";
+
 import { CheckCircle, Code, Globe, Zap } from "lucide-react";
 
 const FeaturesSection = () => {

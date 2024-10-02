@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { redirect, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -27,9 +27,12 @@ import {
 import FileUpload, { FileType } from "@/components/file-upload";
 import { uploadBlob } from "@/actions/blob.actions";
 import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
-import { useSession } from "@/providers/session-provider";
 import { getInitials } from "@/helpers";
-import { updateUser } from "@/data-access/user";
+import { findUniqueUser, updateUser } from "@/data-access/user";
+import { getUserAction } from "@/actions/lucia.actions";
+import { SessionUser } from "@/lib/lucia";
+import { Session } from "lucia";
+import { User } from "@prisma/client";
 
 const themes = [
   { name: "light", color: "#ffffff" },
@@ -43,8 +46,21 @@ const themes = [
 ];
 
 export default function AccountTab() {
-  const { user, session } = useSession();
-  if (!user || !session) redirect("/");
+  // const { user, session } = useSession();
+  const [user, setUser] = useState<User>();
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { user: sessionUser, session } = await getUserAction();
+      if (sessionUser) {
+        const { user } = await findUniqueUser({
+          where: { id: sessionUser.id },
+        });
+        setUser(user);
+      }
+    };
+    fetch();
+  }, []);
 
   const router = useRouter();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -71,7 +87,7 @@ export default function AccountTab() {
       setIsUploadingAvatar(false);
       router.refresh();
       setIsModalOpen(false);
-      await updateUser({ where: { id: user.id }, data: { avatar: blob.url } });
+      await updateUser({ where: { id: user?.id }, data: { avatar: blob.url } });
       toast.success("Avatar uploaded successfully");
     } else {
       setIsUploadingAvatar(false);
@@ -88,7 +104,7 @@ export default function AccountTab() {
     startTransition(async () => {
       try {
         await updateUser({
-          where: { id: user.id },
+          where: { id: user?.id },
           data: { name: formData.get("name") as string, theme: selectedTheme },
         });
         toast.success("Successfully updated user");
@@ -99,6 +115,7 @@ export default function AccountTab() {
     });
   };
 
+  if (!user) return null;
   return (
     <form onSubmit={handleSubmit}>
       <TabsContent value="account" className="space-y-4">
@@ -114,9 +131,9 @@ export default function AccountTab() {
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
               <div className="w-36 grid place-items-center">
                 <Avatar className="w-24 h-24">
-                  <AvatarImage src={user.avatar ?? ""} alt="Avatar" />
+                  <AvatarImage src={user?.avatar ?? ""} alt="Avatar" />
                   <AvatarFallback className="bg-red-500 text-white text-xs">
-                    {getInitials(user.name!)}
+                    {getInitials(user?.name!)}
                   </AvatarFallback>
                 </Avatar>
               </div>
@@ -155,7 +172,7 @@ export default function AccountTab() {
                   id="email"
                   name="email"
                   type="email"
-                  defaultValue={user.email}
+                  defaultValue={user?.email}
                   disabled
                 />
               </div>
@@ -166,13 +183,13 @@ export default function AccountTab() {
                 <Input
                   id="name"
                   name="name"
-                  defaultValue={user.name!}
+                  defaultValue={user?.name!}
                   placeholder="Enter your name"
                   required
                 />
               </div>
             </div>
-            <input type="hidden" name="id" value={user.id} />
+            <input type="hidden" name="id" value={user?.id} />
           </CardContent>
         </Card>
         <Card>

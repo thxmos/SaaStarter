@@ -16,17 +16,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { sendResetEmail } from "@/app/auth/auth.action";
 import React from "react";
 import { toast } from "sonner";
-import { useSession } from "@/providers/session-provider";
-import { redirect } from "next/navigation";
 
 export default function AwaitingVerification({
   searchParams,
 }: {
   searchParams: { email?: string };
 }) {
-  const { user } = useSession();
-  if (user) redirect("/");
-
   const [email, setEmail] = useState(searchParams.email ?? "");
   const [isPending, startTransition] = useTransition();
   const [resendStatus, setResendStatus] = useState<

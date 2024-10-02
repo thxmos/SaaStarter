@@ -1,3 +1,5 @@
+"use client";
+
 import { Parallax } from "react-parallax";
 import { Button } from "@/components/ui/button";
 import heroBgPic from "@/assets/hero-bg.jpg";

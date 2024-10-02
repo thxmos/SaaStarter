@@ -4,9 +4,7 @@ import { useState } from "react";
 import { LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs } from "@/components/ui/tabs";
-import { useSession } from "@/providers/session-provider";
 import { TabsContent } from "@radix-ui/react-tabs";
-import { redirect } from "next/navigation";
 import BeanMachineTab from "../dashboard/bean-machine-tab";
 
 export default function Dashboard({
@@ -14,9 +12,6 @@ export default function Dashboard({
 }: {
   searchParams: { tab?: string };
 }) {
-  const { user } = useSession();
-  if (!user) return redirect("/");
-
   const tabs = [
     {
       key: "bean-machine",
