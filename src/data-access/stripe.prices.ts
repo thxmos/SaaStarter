@@ -1,41 +1,49 @@
 import { cache } from "react";
 import { authCheck } from "./auth-check";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Price, Prisma } from "@prisma/client";
 
-export const createPrice = async (options: Prisma.PriceCreateArgs) => {
+export const createPrice = async (
+  options: Prisma.PriceCreateArgs,
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
-    const createdPrice = await prisma.price.create({
+    await prisma.price.create({
       ...options,
     });
-    return createdPrice;
+    return { success: true };
   } catch (error) {
     console.error("Failed to create price", error);
     return { error: "Failed to create price" };
   }
 };
 
-export const findPrices = cache(async (options: Prisma.PriceFindManyArgs) => {
-  try {
-    authCheck();
-    const foundPrices = await prisma.price.findMany({ ...options });
-    return foundPrices;
-  } catch (error) {
-    console.error(`Failed to find prices`, error);
-    return { error: error ?? "Failed to fetch prices" };
-  }
-});
+export const findPrices = cache(
+  async (
+    options?: Prisma.PriceFindManyArgs,
+  ): Promise<{ prices: Price[]; error?: string }> => {
+    try {
+      authCheck();
+      const foundPrices = await prisma.price.findMany({ ...options });
+      return { prices: foundPrices };
+    } catch (error) {
+      console.error(`Failed to find prices`, error);
+      return { prices: [], error: "Failed to fetch prices" };
+    }
+  },
+);
 
 export const findUniquePrice = cache(
-  async (options: Prisma.PriceFindUniqueArgs) => {
+  async (
+    options: Prisma.PriceFindUniqueArgs,
+  ): Promise<{ price?: Price; error?: string }> => {
     try {
       authCheck();
       const foundPrice = await prisma.price.findUnique({
         ...options,
       });
       if (!foundPrice) return { error: "Price not found" };
-      return foundPrice;
+      return { price: foundPrice };
     } catch (error) {
       console.error("Failed to find price with options", options, error);
       return { error: "Failed to fetch price" };
@@ -43,28 +51,32 @@ export const findUniquePrice = cache(
   },
 );
 
-export const updatePrice = async (options: Prisma.PriceUpdateArgs) => {
+export const updatePrice = async (
+  options: Prisma.PriceUpdateArgs,
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
     const updatedPrice = await prisma.price.update({
       ...options,
     });
     if (!updatedPrice) return { error: "Price not found" };
-    return updatedPrice;
+    return { success: true };
   } catch (error) {
     console.error("Failed to update price", error);
     return { error: "Failed to update price" };
   }
 };
 
-export const deletePrice = async (options: Prisma.PriceDeleteArgs) => {
+export const deletePrice = async (
+  options: Prisma.PriceDeleteArgs,
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
     const deletedPrice = await prisma.price.delete({
       ...options,
     });
     if (!deletedPrice) return { error: "Price not found" };
-    return deletedPrice;
+    return { success: true };
   } catch (error) {
     console.error("Failed to delete price", error);
     return { error: "Failed to delete price" };

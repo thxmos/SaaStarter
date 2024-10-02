@@ -7,30 +7,30 @@ import { Prisma, User } from "@prisma/client";
 
 export const createUser = async (
   options: Prisma.UserCreateArgs,
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
-    const createdUser = await prisma.user.create({
+    await prisma.user.create({
       ...options,
     });
     return { success: true };
   } catch (error) {
     console.error("Failed to create user", error);
-    return { success: true, error: "Failed to create user" };
+    return { error: "Failed to create user" };
   }
 };
 
 export const findUsers = cache(
   async (
-    options: Prisma.UserFindManyArgs,
-  ): Promise<{ users?: User[]; error?: string }> => {
+    options?: Prisma.UserFindManyArgs,
+  ): Promise<{ users: User[]; error?: string }> => {
     try {
       authCheck();
       const foundUsers = await prisma.user.findMany({ ...options });
       return { users: foundUsers };
     } catch (error) {
       console.error(`Failed to find users`, error);
-      return { error: "Failed to fetch users" };
+      return { users: [], error: "Failed to fetch users" };
     }
   },
 );
@@ -57,7 +57,7 @@ export const findUniqueUser = cache(
 
 export const updateUser = async (
   options: Prisma.UserUpdateArgs,
-): Promise<{ success: boolean; error?: string }> => {
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
     await prisma.user.update({
@@ -66,16 +66,18 @@ export const updateUser = async (
     return { success: true };
   } catch (error) {
     console.error("Failed to update user", error);
-    return { success: false, error: "Failed to update user" };
+    return { error: "Failed to update user" };
   }
 };
 
-export const deleteUser = async (options: Prisma.UserDeleteArgs) => {
+export const deleteUser = async (
+  options: Prisma.UserDeleteArgs,
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
     const deletedUser = await prisma.user.delete({ ...options });
     if (!deletedUser) return { error: "User not found" };
-    return deletedUser;
+    return { success: true };
   } catch (error) {
     console.error("Failed to delete user", error);
     return { error: "Failed to delete user" };

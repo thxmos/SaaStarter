@@ -16,27 +16,24 @@ export default function UserSettings({
 }: {
   searchParams: { tab?: string };
 }) {
-  const { user } = useSession();
-  if (!user) return redirect("/");
-
   const tabs = [
     {
       key: "account",
       label: "Account",
       icon: <User className={"mr-2 h-4 w-4"} />,
-      tabContent: <AccountTab user={user} />,
+      tabContent: <AccountTab />,
     },
     {
       key: "security",
       label: "Security",
       icon: <Lock className={"mr-2 h-4 w-4"} />,
-      tabContent: <SecurityTab user={user} />,
+      tabContent: <SecurityTab />,
     },
     {
       key: "billing",
       label: "Billing",
       icon: <CreditCard className={"mr-2 h-4 w-4"} />,
-      tabContent: <BillingTab user={user} />,
+      tabContent: <BillingTab />,
     },
   ];
 

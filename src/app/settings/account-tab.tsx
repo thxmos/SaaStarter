@@ -67,12 +67,12 @@ export default function AccountTab() {
     const blob = await uploadBlob(formData);
 
     if (blob) {
-      toast.success("Avatar uploaded successfully");
       await updateUserAvatar(blob.url);
       setIsUploadingAvatar(false);
       router.refresh();
       setIsModalOpen(false);
-      await updateUser(user.id, { avatar: blob.url });
+      await updateUser({ where: { id: user.id }, data: { avatar: blob.url } });
+      toast.success("Avatar uploaded successfully");
     } else {
       setIsUploadingAvatar(false);
       toast.error("Failed to upload avatar");
@@ -81,27 +81,17 @@ export default function AccountTab() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const isSessionValid = await isValidSession();
-    if (!isSessionValid) return;
 
     const formData = new FormData(event.currentTarget);
     formData.append("theme", selectedTheme);
 
     startTransition(async () => {
       try {
-        const result = await updateUser(formData);
-        if (result.message === "User successfully updated!") {
-          toast.success(result.message);
-          const updatedName = formData.get("name") as string;
-          setUser({
-            ...user,
-            name: updatedName,
-            theme: selectedTheme,
-          });
-          router.refresh();
-        } else {
-          toast.error("Failed to update user");
-        }
+        await updateUser({
+          where: { id: user.id },
+          data: { name: formData.get("name") as string, theme: selectedTheme },
+        });
+        toast.success("Successfully updated user");
       } catch (error) {
         console.error(error);
         toast.error("An error occurred while updating user");

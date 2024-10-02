@@ -1,43 +1,49 @@
 import { cache } from "react";
 import { authCheck } from "./auth-check";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 
-export const createProduct = async (options: Prisma.ProductCreateArgs) => {
+export const createProduct = async (
+  options: Prisma.ProductCreateArgs,
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
-    const createdProduct = await prisma.product.create({
+    await prisma.product.create({
       ...options,
     });
-    return createdProduct;
+    return { success: true };
   } catch (error) {
     console.error("Failed to create product", error);
-    return { error: "Failed to create product" };
+    return { error: "Failed to create user" };
   }
 };
 
 export const findProducts = cache(
-  async (options: Prisma.ProductFindManyArgs) => {
+  async (
+    options?: Prisma.ProductFindManyArgs,
+  ): Promise<{ products: Product[]; error?: string }> => {
     try {
       authCheck();
       const foundProducts = await prisma.product.findMany({ ...options });
-      return foundProducts;
+      return { products: foundProducts };
     } catch (error) {
       console.error(`Failed to find products`, error);
-      return { error: "Failed to fetch products" };
+      return { products: [], error: "Failed to fetch products" };
     }
   },
 );
 
 export const findUniqueProduct = cache(
-  async (options: Prisma.ProductFindUniqueArgs) => {
+  async (
+    options: Prisma.ProductFindUniqueArgs,
+  ): Promise<{ product?: Product; error?: string }> => {
     try {
       authCheck();
       const foundProduct = await prisma.product.findUnique({
         ...options,
       });
       if (!foundProduct) return { error: "Product not found" };
-      return foundProduct;
+      return { product: foundProduct };
     } catch (error) {
       console.error("Failed to find user", options, error);
       return { error: "Failed to fetch product" };
@@ -45,28 +51,31 @@ export const findUniqueProduct = cache(
   },
 );
 
-export const updateProduct = async (options: Prisma.ProductUpdateArgs) => {
+export const updateProduct = async (
+  options: Prisma.ProductUpdateArgs,
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
     const updatedProduct = await prisma.product.update({
       ...options,
     });
-    if (!updatedProduct) return { error: "Product not found" };
-    return updatedProduct;
+    return { success: true };
   } catch (error) {
     console.log("Failed to update product", error);
     return { error: "Failed to update product" };
   }
 };
 
-export const deleteProduct = async (options: Prisma.ProductDeleteArgs) => {
+export const deleteProduct = async (
+  options: Prisma.ProductDeleteArgs,
+): Promise<{ success?: boolean; error?: string }> => {
   try {
     authCheck();
     const deletedProduct = await prisma.product.delete({
       ...options,
     });
     if (!deletedProduct) return { error: "Product not found" };
-    return deletedProduct;
+    return { success: true };
   } catch (error) {
     console.log("Failed to delete product", error);
     return { error: "Failed to delete product" };

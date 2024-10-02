@@ -14,17 +14,13 @@ import { Label } from "@/components/ui/label";
 import React, { useTransition, useRef } from "react";
 import { toast } from "sonner";
 import { passwordReset } from "./settings.action";
-import { revalidatePath } from "next/cache";
+import { useSession } from "@/providers/session-provider";
+import { redirect } from "next/navigation";
 
-interface User {
-  id: string;
-}
+export default function SecurityTab() {
+  const { user } = useSession();
+  if (!user) return redirect("/");
 
-interface Props {
-  user: User;
-}
-
-export default function SecurityTab({ user }: Props) {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -47,8 +43,6 @@ export default function SecurityTab({ user }: Props) {
       }
     });
   };
-
-  revalidatePath("/settings");
 
   return (
     <>

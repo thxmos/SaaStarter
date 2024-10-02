@@ -14,10 +14,6 @@ import { Download } from "lucide-react";
 import { useSession } from "@/providers/session-provider";
 import Link from "next/link";
 
-interface Props {
-  user: any;
-}
-
 const mockBillingHistory = [
   {
     date: "July 1, 2024",
@@ -31,21 +27,11 @@ const mockBillingHistory = [
   },
 ];
 
-const BillingTab: React.FC<Props> = () => {
-  const { user } = useSession();
-
-  if (!user) {
+const BillingTab: React.FC = () => {
+  const { user, session } = useSession();
+  if (!user || !session) {
     return null;
   }
-
-  // const [isSubscribed, setIsSubscribed] = useState(user.isSubscribed);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [billingInfo, setBillingInfo] = useState({
-    cardNumber: "",
-    expirationDate: "",
-    cvv: "",
-    billingAddress: "",
-  });
 
   return (
     <Card className="w-full">

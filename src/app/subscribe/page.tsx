@@ -1,5 +1,7 @@
 import PricingCard from "@/components/pricing-card";
 import { APP_NAME } from "@/constants";
+import { findPrices } from "@/data-access/stripe.prices";
+import { findProducts } from "@/data-access/stripe.products";
 import { prisma } from "@/lib/prisma";
 import { Price, Product } from "@prisma/client";
 
@@ -10,8 +12,8 @@ interface Plan {
 }
 
 const SubscribePage = async () => {
-  const prices = await prisma.price.findMany();
-  const products = await prisma.product.findMany();
+  const { prices } = await findPrices();
+  const { products } = await findProducts();
 
   const plans = prices.map((price) => {
     const product = products.find(

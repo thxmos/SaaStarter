@@ -1,9 +1,7 @@
 "use server";
 
-import { UserDto } from "@/data-access/user";
-import { prisma } from "@/lib/prisma";
+import { findUniqueUser, updateUser } from "@/data-access/user";
 import * as argon2 from "argon2";
-import { revalidatePath } from "next/cache";
 
 export async function passwordReset(formData: FormData, userId: string) {
   const currentPassword = formData.get("currentPassword") as string;
@@ -18,13 +16,13 @@ export async function passwordReset(formData: FormData, userId: string) {
   }
 
   try {
-    const user = await prisma.user.findUnique({
+    const { user, error } = await findUniqueUser({
       where: { id: userId },
       select: { password: true },
     });
 
-    if (!user) {
-      throw new Error("User not found");
+    if (!user || error) {
+      throw new Error(error);
     }
 
     const isCurrentPasswordValid = await argon2.verify(
@@ -37,7 +35,7 @@ export async function passwordReset(formData: FormData, userId: string) {
 
     const hashedPassword = await argon2.hash(newPassword);
 
-    await prisma.user.update({
+    await updateUser({
       where: { id: userId },
       data: { password: hashedPassword },
     });
