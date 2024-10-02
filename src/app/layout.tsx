@@ -5,7 +5,6 @@ import { Toaster } from "sonner";
 import Navbar from "@/components/nav-bar";
 import { getUser } from "@/lib/lucia";
 import { ThemeProvider } from "@/components/theme-provider";
-import { SessionProvider } from "@/providers/session-provider";
 import { APP_DESCRIPTION, APP_NAME } from "@/constants";
 
 const geistSans = localFont({
@@ -29,7 +28,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, session } = await getUser();
+  const { user } = await getUser();
   //TODO: apply user layout
 
   return (
@@ -37,18 +36,16 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider session={session} sessionUser={user}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme={user?.theme || "bean"}
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Navbar />
-            <Toaster richColors />
-            {children}
-          </ThemeProvider>
-        </SessionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme={user?.theme || "bean"}
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          <Toaster richColors />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
