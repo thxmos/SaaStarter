@@ -16,39 +16,22 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODOS:
 
-### small things
-
-- refresh theme on user update
-- redirect only routes
-- layout to prevent page scrolling when unecessary
-- store
-
-### Purchase / Transactions ?
-
-- Product default prices
-
-- isVerified access restriction
-
-### Nice to haves
-
-- allow users to view actual stripe billing data from account settings
-- documentation
-  - where to get env variables
-  - commands
-- some framer motions
-
-### Verification / Auth
-
-- Location Verification
+- REFACTOR UseSession / getUserSession
+- REFACTOR Look into best way to do forms
+  - Password Reset page form
+- UI Awaiting page fix emails
+- UI Main layout component (prevent page scrolling when unecessary)
+- UI refresh theme on user update (look into theme provider or revalidatePath)
+- AUTH isVerified access restriction (either edit generic layout or make a verified-layout protection layer)
+- AUTH Location Verification
   - verify different devices / location from the first signed up device
   - 2fa enablement
-
-### Refactor / Clean up
-
-- Form Update
-  - look into best way to do forms
-  - dont make server actions ingest forms, process forms from client components
-  - dont need to store as much info in product maybe just the ids, make stripe actions to access needed data (actually maybe itd be good to have if moving to another platform and wanting to keep prod data)
+- FEATURE Billing Page
+- STRIPE product default prices
+- DOCUMENTATION
+  - where to get env variables
+  - commands
+  - stripe setup
 - Stripe Webhook Helper Functions
   - move all stripe webhooks into helper function files? products.helpers.ts, prices.helpers.ts or something more modular
 

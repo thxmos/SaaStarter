@@ -60,11 +60,10 @@ const SignUpForm = () => {
     if (res.success) {
       toast.success("Account created successfully");
       router.push(`/verify-email/awaiting?email=${values.email}`);
-      setLoading(false);
     } else {
       toast.error(res.error);
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   return (

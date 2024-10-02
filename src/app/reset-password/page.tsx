@@ -17,8 +17,6 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { resetPassword } from "../auth/auth.action";
 
-// ERROR HANDLING button stays frozen, but needs to be better in general, don't use usestate for form values
-
 export default function PasswordResetPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -58,6 +56,7 @@ export default function PasswordResetPage() {
       const res = await resetPassword(token, password);
       if (res.success) {
         setSuccess(true);
+        setIsLoading(false);
       } else {
         setIsLoading(false);
         setError("Failed to reset password. Please try again.");
