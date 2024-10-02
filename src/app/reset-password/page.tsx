@@ -18,10 +18,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { resetPassword } from "../auth/auth.action";
 
 export default function PasswordResetPage() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [status, setStatus] = useState<{
+    type: "idle" | "error" | "success";
+    message: string;
+  }>({ type: "idle", message: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState("");
 
@@ -36,18 +36,25 @@ export default function PasswordResetPage() {
     }
   }, [searchParams]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
+    const formData = new FormData(e.currentTarget);
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setStatus({ type: "error", message: "Passwords do not match" });
       setIsLoading(false);
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
+      setStatus({
+        type: "error",
+        message: "Password must be at least 8 characters long",
+      });
       setIsLoading(false);
       return;
     }
@@ -55,19 +62,24 @@ export default function PasswordResetPage() {
     try {
       const res = await resetPassword(token, password);
       if (res.success) {
-        setSuccess(true);
-        setIsLoading(false);
+        setStatus({ type: "success", message: "Password reset successful" });
       } else {
-        setIsLoading(false);
-        setError("Failed to reset password. Please try again.");
+        setStatus({
+          type: "error",
+          message: "Failed to reset password. Please try again.",
+        });
       }
     } catch (err) {
+      setStatus({
+        type: "error",
+        message: "An error occurred. Please try again later.",
+      });
+    } finally {
       setIsLoading(false);
-      setError("An error occurred. Please try again later.");
     }
   };
 
-  if (success) {
+  if (status.type === "success") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Card className="w-full max-w-md">
@@ -102,20 +114,19 @@ export default function PasswordResetPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {error && (
+            {status.type === "error" && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{status.message}</AlertDescription>
               </Alert>
             )}
             <div className="space-y-2">
               <Label htmlFor="password">New Password</Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
               />
@@ -124,9 +135,8 @@ export default function PasswordResetPage() {
               <Label htmlFor="confirmPassword">Confirm New Password</Label>
               <Input
                 id="confirmPassword"
+                name="confirmPassword"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 minLength={8}
               />
