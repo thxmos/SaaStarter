@@ -1,6 +1,5 @@
 "use server";
 
-import { UserDto } from "@/data-access/user";
 import { prisma } from "@/lib/prisma";
 import * as argon2 from "argon2";
 import { revalidatePath } from "next/cache";

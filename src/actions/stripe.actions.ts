@@ -1,6 +1,7 @@
 "use server";
 
-import { getUser } from "@/lib/lucia";
+import { findUniqueUser } from "@/data-access/user";
+import { getUser, lucia } from "@/lib/lucia";
 import { Price } from "@prisma/client";
 import Stripe from "stripe";
 
@@ -46,13 +47,25 @@ export async function getPrices(active: boolean = true) {
 
 export const createCheckoutSession = async (price: Price, quanity: number) => {
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-    const { user } = await getUser();
+    const { user: luciaUser } = await getUser();
 
-    if (!user || !user.stripeCustomerId) {
-      console.error("User not found or missing Stripe customer ID");
+    if (!luciaUser) {
+      console.error("Session user not found.");
       return { success: false };
     }
+    const { user, error } = await findUniqueUser({
+      where: { id: luciaUser.id },
+      select: { stripeCustomerId: true },
+    });
+
+    if (!user || !user.stripeCustomerId) {
+      console.error(error);
+      return {
+        success: false,
+      };
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
     const customer = await stripe.customers.retrieve(user.stripeCustomerId);
 
