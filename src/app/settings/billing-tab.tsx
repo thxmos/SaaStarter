@@ -11,7 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Download } from "lucide-react";
-import { useSession } from "@/providers/session-provider";
 import Link from "next/link";
 
 const mockBillingHistory = [
@@ -28,11 +27,6 @@ const mockBillingHistory = [
 ];
 
 const BillingTab: React.FC = () => {
-  const { user, session } = useSession();
-  if (!user || !session) {
-    return null;
-  }
-
   return (
     <Card className="w-full">
       <CardHeader>
@@ -61,13 +55,13 @@ const BillingTab: React.FC = () => {
         </div>
       </CardContent>
       <CardFooter className="flex space-x-4">
-        <Link
+        {/* <Link
           target="_blank"
           // TODO: change this so it's not hardcoded
           href={`https://billing.stripe.com/p/login/test_8wM17y7ej2tF5vG9AA?prefilled_email=${user.email}`}
         >
-          <Button>Customer Portal</Button>
-        </Link>
+        </Link> */}
+        <Button>Customer Portal</Button>
       </CardFooter>
     </Card>
   );

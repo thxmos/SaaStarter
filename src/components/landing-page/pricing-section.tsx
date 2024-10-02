@@ -1,3 +1,5 @@
+"use client";
+
 import { CheckCircle } from "lucide-react";
 import { Button } from "../ui/button";
 import { Parallax } from "react-parallax";
