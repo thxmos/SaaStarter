@@ -35,14 +35,24 @@ export default function DropdownMenu({ user }: Props) {
   return (
     <DropdownWrapper open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Avatar className="cursor-pointer">
-          <AvatarImage src={user.avatar} alt={user.name} />
+        <Avatar
+          className="cursor-pointer"
+          role="button"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label="User menu"
+        >
+          <AvatarImage src={user.avatar} alt="" />
           <AvatarFallback className="bg-red-500 text-white text-xs">
             {getInitials(user.name!)}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 mt-1 rounded-t-none border-none">
+      <DropdownMenuContent
+        className="w-56 mt-1 rounded-t-none border-none"
+        role="menu"
+        aria-label="User account options"
+      >
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
@@ -70,9 +80,10 @@ export default function DropdownMenu({ user }: Props) {
                   href={item.href}
                   className="flex items-center justify-between w-full"
                   onClick={item.onClick ?? closeDropdown}
+                  role="menuitem"
                 >
-                  <p>{item.label}</p>
-                  <item.icon className="text-sm" />
+                  <span>{item.label}</span>
+                  <item.icon className="text-sm" aria-hidden="true" />
                 </Link>
               }
             </DropdownMenuItem>

@@ -1,19 +1,22 @@
-import React from "react";
 import { getUser } from "@/lib/lucia";
 import { redirect } from "next/navigation";
 
 interface Props {
   children: React.ReactNode;
+  redirectUrl?: string;
 }
 
-const SettingsLayout: React.FC<Props> = async ({ children }) => {
+const UnverifiedOnlyLayout: React.FC<Props> = async ({
+  children,
+  redirectUrl,
+}) => {
   const { user, session } = await getUser();
 
-  if (!user || !session) {
-    redirect("/");
+  if (user || session) {
+    redirect(redirectUrl ?? "/dashboard");
   }
 
   return <>{children}</>;
 };
 
-export default SettingsLayout;
+export default ProtectedLayout;

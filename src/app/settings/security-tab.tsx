@@ -68,7 +68,11 @@ export default function SecurityTab() {
           <CardTitle className="text-2xl">Security Settings</CardTitle>
           <CardDescription>Manage your account's security.</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit} ref={formRef}>
+        <form
+          onSubmit={handleSubmit}
+          ref={formRef}
+          aria-label="Password Change Form"
+        >
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="current-password">Current Password</Label>
@@ -79,6 +83,7 @@ export default function SecurityTab() {
                 required
                 minLength={8}
                 aria-describedby="current-password-hint"
+                aria-required="true"
               />
               <p
                 id="current-password-hint"
@@ -96,6 +101,7 @@ export default function SecurityTab() {
                 required
                 minLength={8}
                 aria-describedby="new-password-hint"
+                aria-required="true"
               />
               <p
                 id="new-password-hint"
@@ -113,17 +119,23 @@ export default function SecurityTab() {
                 required
                 minLength={8}
                 aria-describedby="confirm-password-hint"
+                aria-required="true"
               />
               <p
                 id="confirm-password-hint"
                 className="text-sm text-muted-foreground"
               >
-                Confirm password must be at least 8 characters long
+                Confirm password must match the new password
               </p>
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={isPending || !user}>
+            <Button
+              type="submit"
+              disabled={isPending}
+              aria-disabled={isPending}
+              aria-live="polite"
+            >
               {isPending ? "Updating..." : "Update Password"}
             </Button>
           </CardFooter>

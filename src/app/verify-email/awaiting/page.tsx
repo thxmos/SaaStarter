@@ -45,7 +45,7 @@ export default function AwaitingVerification({
 
     startTransition(async () => {
       try {
-        const result = await sendResetEmail({ email });
+        const result = await sendResetEmail(email);
         if (result.success) {
           setResendStatus("success");
           toast.success("Verification email sent successfully");
@@ -70,7 +70,7 @@ export default function AwaitingVerification({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center" aria-hidden="true">
             <Mail className="h-12 w-12 text-blue-500" />
           </div>
           <p className="text-center text-gray-600">
@@ -79,7 +79,7 @@ export default function AwaitingVerification({
           </p>
           {resendStatus === "success" && (
             <Alert>
-              <CheckCircle className="h-4 w-4" />
+              <CheckCircle className="h-4 w-4" aria-hidden="true" />
               <AlertTitle>Email Sent!</AlertTitle>
               <AlertDescription>
                 A new verification email has been sent to your inbox.
@@ -88,7 +88,7 @@ export default function AwaitingVerification({
           )}
           {resendStatus === "error" && (
             <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
+              <AlertCircle className="h-4 w-4" aria-hidden="true" />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>
                 Failed to resend verification email. Please try again later.
@@ -109,12 +109,32 @@ export default function AwaitingVerification({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  aria-required="true"
+                  aria-invalid={resendStatus === "error"}
+                  aria-describedby="email-error"
                 />
+                {resendStatus === "error" && (
+                  <p id="email-error" className="text-red-500" role="alert">
+                    Please enter a valid email address.
+                  </p>
+                )}
               </div>
-              <Button className="w-full" type="submit" disabled={isPending}>
+              <Button
+                className="w-full"
+                type="submit"
+                disabled={isPending}
+                aria-disabled={isPending}
+                aria-busy={isPending}
+              >
                 {isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2
+                      className="mr-2 h-4 w-4 animate-spin"
+                      aria-hidden="true"
+                    />
+                    <span className="sr-only">
+                      Resending verification email
+                    </span>
                     Resending...
                   </>
                 ) : (

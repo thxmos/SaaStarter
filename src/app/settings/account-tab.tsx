@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,6 @@ import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
 import { getInitials } from "@/helpers";
 import { findUniqueUser, updateUser } from "@/data-access/user";
 import { getUserAction } from "@/actions/lucia.actions";
-import { SessionUser } from "@/lib/lucia";
-import { Session } from "lucia";
 import { User } from "@prisma/client";
 
 const themes = [
@@ -46,7 +44,6 @@ const themes = [
 ];
 
 export default function AccountTab() {
-  // const { user, session } = useSession();
   const [user, setUser] = useState<User>();
 
   useEffect(() => {
@@ -73,12 +70,26 @@ export default function AccountTab() {
 
   const handleAvatarUpload = async () => {
     const isSessionValid = await isValidSession();
-    if (!isSessionValid) return;
-    if (!avatarFile) return;
+    if (!isSessionValid) {
+      toast.error("Your session has expired. Please log in again.");
+      router.push("/login");
+      return;
+    }
+    if (!avatarFile) {
+      toast.error("Please select an image to upload.");
+      return;
+    }
     const formData = new FormData();
     formData.append("file", avatarFile);
     formData.append("path", "avatars/");
     setIsUploadingAvatar(true);
+
+    // Announce to screen readers that upload has started
+    const statusElement = document.getElementById("upload-status");
+    if (statusElement) {
+      statusElement.textContent = "Avatar upload started";
+      statusElement.setAttribute("aria-live", "polite");
+    }
 
     const blob = await uploadBlob(formData);
 

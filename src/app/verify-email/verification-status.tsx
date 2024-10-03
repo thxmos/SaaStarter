@@ -20,9 +20,9 @@ export default function VerificationStatus({
   isVerified,
 }: VerificationProps) {
   const icon = isVerified ? (
-    <CheckCircle className="h-12 w-12 text-green-500" />
+    <CheckCircle className="h-12 w-12 text-green-500" aria-hidden="true" />
   ) : (
-    <AlertCircle className="h-12 w-12 text-red-500" />
+    <AlertCircle className="h-12 w-12 text-red-500" aria-hidden="true" />
   );
 
   const buttonText = isVerified
@@ -30,19 +30,32 @@ export default function VerificationStatus({
     : "Resend Verification Email";
 
   return (
-    <Card className="w-[350px] max-w-[90%]">
+    <Card
+      className="w-[350px] max-w-[90%]"
+      role="region"
+      aria-label="Email Verification Status"
+    >
       <CardHeader>
-        <div className="flex items-center justify-center mb-4">{icon}</div>
+        <div
+          className="flex items-center justify-center mb-4"
+          aria-hidden="true"
+        >
+          {icon}
+        </div>
         <CardTitle className="text-2xl font-bold text-center">
           Email Verification
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-center text-gray-600">{message}</p>
+        <p className="text-center text-gray-600" aria-live="polite">
+          {message}
+        </p>
       </CardContent>
       <CardFooter className="flex justify-center flex-col">
         <Button asChild>
-          <Link href="/auth">{buttonText}</Link>
+          <Link href="/auth" aria-label={buttonText}>
+            {buttonText}
+          </Link>
         </Button>
         <div className="flex items-center justify-center mb-4">
           {isVerified && <TimedRedirect />}

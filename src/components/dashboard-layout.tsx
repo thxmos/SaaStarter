@@ -14,10 +14,12 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <aside className="w-64 bg-card p-6 shadow-md">
+      <aside
+        className="w-64 bg-card p-6 shadow-md"
+        role="navigation"
+        aria-label="Dashboard Navigation"
+      >
         <div className="flex items-center mb-8">
-          {/* <User className="h-8 w-8 text-primary mr-2" /> */}
           <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
         </div>
         <nav>
@@ -27,14 +29,18 @@ export default function DashboardLayout({
               variant={activeTab === tab.key ? "default" : "ghost"}
               className="w-full justify-start mb-2"
               onClick={() => setActiveTab(tab.key)}
+              aria-current={activeTab === tab.key}
+              aria-label={`${tab.label} tab`}
             >
-              {tab.icon}
-              {tab.label}
+              {tab.icon && <span aria-hidden="true">{tab.icon}</span>}
+              <span>{tab.label}</span>
             </Button>
           ))}
         </nav>
       </aside>
-      {children}
+      <main className="flex-grow" role="main">
+        {children}
+      </main>
     </div>
   );
 }

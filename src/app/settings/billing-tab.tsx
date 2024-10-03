@@ -37,16 +37,22 @@ const BillingTab: React.FC = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold mb-2">Billing History</h3>
-          <ul className="space-y-2">
-            {mockBillingHistory.map((item) => (
+          <h3 className="text-lg font-semibold mb-2" id="billing-history">
+            Billing History
+          </h3>
+          <ul className="space-y-2" aria-labelledby="billing-history">
+            {mockBillingHistory.map((item, index) => (
               <li key={item.date} className="flex justify-between items-center">
                 <span>{item.date}</span>
                 <span className="text-gray-500">{item.amount}</span>
-                <Link href={item.invoiceUrl}>
+                <Link
+                  href={item.invoiceUrl}
+                  aria-label={`Download invoice for ${item.date}`}
+                >
                   <Button variant="ghost" size="sm">
-                    <Download className="h-4 w-4 mr-2" />
-                    Invoice
+                    <Download className="h-4 w-4 mr-2" aria-hidden="true" />
+                    <span className="sr-only">Download</span>
+                    <span aria-hidden="true">Invoice</span>
                   </Button>
                 </Link>
               </li>
@@ -55,13 +61,14 @@ const BillingTab: React.FC = () => {
         </div>
       </CardContent>
       <CardFooter className="flex space-x-4">
-        {/* <Link
-          target="_blank"
-          // TODO: change this so it's not hardcoded
-          href={`https://billing.stripe.com/p/login/test_8wM17y7ej2tF5vG9AA?prefilled_email=${user.email}`}
-        >
-        </Link> */}
-        <Button>Customer Portal</Button>
+        <Link target="_blank" href={`/subscribe`}>
+          <Button>
+            <span className="sr-only">
+              Access customer portal to manage your subscription
+            </span>
+            <span aria-hidden="true">Customer Portal</span>
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
       case "product.updated": {
         const product = data.object as Stripe.Product;
         if (!product) return;
-        const upsert = await prisma.product.upsert({
+        await prisma.product.upsert({
           where: { stripeProductId: product.id },
           create: {
             name: product.name,
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       case "price.updated": {
         const price = data.object as Stripe.Price;
         if (!price) return;
-        const upsert = await prisma.price.upsert({
+        await prisma.price.upsert({
           where: { stripePriceId: price.id },
           create: {
             stripePriceId: price.id.toString(),
@@ -150,8 +150,6 @@ export async function POST(req: NextRequest) {
         await prisma.user.update({
           where: { id: user.id },
           data: {
-            stripePriceId: priceId,
-            isSubscribed: true,
             stripeCustomerId: customer.id,
             subscriptions: {
               connect: {

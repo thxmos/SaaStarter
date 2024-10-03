@@ -10,7 +10,6 @@ import { SessionUser } from "@/lib/lucia";
 import { getUserAction } from "@/actions/lucia.actions";
 
 const Navbar = () => {
-  // const { user } = useSession();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<SessionUser | null>(null);
 
@@ -39,13 +38,23 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="px-4 lg:px-6 h-16 flex items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <Link className="flex items-center justify-center" href="/">
-        <Cpu className="h-6 w-6 text-primary" />
+    <header
+      className="px-4 lg:px-6 h-16 flex items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      role="banner"
+    >
+      <Link
+        className="flex items-center justify-center"
+        href="/"
+        aria-label={"Home Page"}
+      >
+        <Cpu className="h-6 w-6 text-primary" aria-hidden="true" />
         <span className="sr-only">{APP_NAME}</span>
       </Link>
       {!loading && (
-        <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
+        <nav
+          className="ml-auto flex gap-4 sm:gap-6 items-center"
+          aria-label="Main navigation"
+        >
           {/* Unauthenticated Links*/}
           {!user &&
             navLinks.map((link) => (

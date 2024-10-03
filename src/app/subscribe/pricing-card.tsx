@@ -47,9 +47,15 @@ const PricingCard: React.FC<Props> = ({
       className={`flex flex-col min-w-[300px] min ${
         highlighted ? "border-blue-500 border-2" : ""
       }`}
+      aria-labelledby={`pricing-plan-${product.id}`}
     >
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">{product.name}</CardTitle>
+        <CardTitle
+          id={`pricing-plan-${product.id}`}
+          className="text-2xl font-bold"
+        >
+          {product.name}
+        </CardTitle>
         <CardDescription>
           <span className="text-3xl font-bold">
             {Number(price.unitAmount) / 100}
@@ -59,10 +65,17 @@ const PricingCard: React.FC<Props> = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
-        <ul className="space-y-2">
+        <ul
+          className="space-y-2"
+          aria-label={`Features of ${product.name} plan`}
+        >
           {features.map((feature, index) => (
-            <li className="flex items-center">
-              <Check className="text-green-500 mr-2" size={20} />
+            <li key={index} className="flex items-center">
+              <Check
+                className="text-green-500 mr-2"
+                size={20}
+                aria-hidden="true"
+              />
               <span>{feature}</span>
             </li>
           ))}
@@ -73,6 +86,7 @@ const PricingCard: React.FC<Props> = ({
           onClick={handleCheckout}
           className="w-full"
           variant={highlighted ? "default" : "outline"}
+          aria-label={`Subscribe to ${product.name} plan`}
         >
           Subscribe
         </Button>

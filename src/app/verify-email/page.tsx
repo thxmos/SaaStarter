@@ -38,10 +38,25 @@ export default async function VerifyEmail({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Suspense fallback={<p>Verifying...</p>}>
-        <VerificationStatus message={message} isVerified={isVerified} />
+    <main
+      className="min-h-screen flex items-center justify-center"
+      role="main"
+      aria-label="Email Verification Page"
+    >
+      <Suspense
+        fallback={
+          <p aria-live="polite" aria-busy="true">
+            Verifying email...
+          </p>
+        }
+      >
+        <VerificationStatus
+          message={message}
+          isVerified={isVerified}
+          aria-live="polite"
+          aria-atomic="true"
+        />
       </Suspense>
-    </div>
+    </main>
   );
 }
