@@ -1,30 +1,38 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, Code, Globe, Zap } from "lucide-react";
 
-const FeaturesSection = () => {
-  const features = [
-    {
-      icon: Zap,
-      title: "Lightning Fast",
-      description: "Experience unparalleled speed and efficiency.",
-    },
-    {
-      icon: Globe,
-      title: "Global Access",
-      description: "Access your data from anywhere in the world.",
-    },
-    {
-      icon: Code,
-      title: "Powerful API",
-      description: "Integrate seamlessly with your existing tools.",
-    },
-    {
-      icon: CheckCircle,
-      title: "99.9% Uptime",
-      description: "Rely on our robust and stable infrastructure.",
-    },
-  ];
+const features = [
+  {
+    icon: Zap,
+    title: "Lightning Fast",
+    description: "Experience unparalleled speed and efficiency.",
+  },
+  {
+    icon: Globe,
+    title: "Global Access",
+    description: "Access your data from anywhere in the world.",
+  },
+  {
+    icon: Code,
+    title: "Powerful API",
+    description: "Integrate seamlessly with your existing tools.",
+  },
+  {
+    icon: CheckCircle,
+    title: "99.9% Uptime",
+    description: "Rely on our robust and stable infrastructure.",
+  },
+];
+
+export default function FeaturesSection() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <section
@@ -36,20 +44,25 @@ const FeaturesSection = () => {
           Key Features
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center text-center bg-card p-6 rounded-lg shadow-lg"
-            >
-              <feature.icon className="h-12 w-12 mb-4 text-primary" />
-              <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground">{feature.description}</p>
-            </div>
-          ))}
+          <AnimatePresence>
+            {isMounted &&
+              features.map((feature, index) => (
+                <motion.div
+                  key={index}
+                  className="flex flex-col items-center text-center bg-card p-6 rounded-lg shadow-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <feature.icon className="h-12 w-12 mb-4 text-primary" />
+                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </motion.div>
+              ))}
+          </AnimatePresence>
         </div>
       </div>
     </section>
   );
-};
-
-export default FeaturesSection;
+}
