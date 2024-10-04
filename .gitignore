@@ -39,3 +39,9 @@ next-env.d.ts
 # prisma migration
 /prisma/migrations
 
+
+# sst
+.sst
+
+# open-next
+.open-next

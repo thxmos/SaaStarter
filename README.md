@@ -38,3 +38,34 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ### Theme Gen
 
 https://zippystarter.com/tools/shadcn-ui-theme-generator
+
+### AWS Config with SST
+
+Create an IAM user
+https://guide.sst.dev/chapters/create-an-iam-user.html
+
+Configure AWS CLI
+https://guide.sst.dev/chapters/configure-the-aws-cli.html
+
+General SST Docs
+https://sst.dev/docs/start/aws/nextjs
+
+sst.aws.Postgres (https://sst.dev/docs/component/aws/postgres)
+
+- look into options
+- look into db connection with prisma
+- aurora serverless postgres
+- Generate a pre-signed URL
+- scaling configuration
+
+The command `npx sst bind npx prisma db push` is a combination of two separate commands that work together to push your Prisma schema changes to your database in the context of your SST (Serverless Stack) application. Let's break down what each part does:
+
+1. `npx sst bind`:
+
+- This command runs your script with the same environment variables and AWS permissions that your deployed application has.
+- It loads your SST app's config and sets up the AWS credentials and environment variables.
+- This is crucial because it provides access to resources like your database connection string, which is stored securely and not directly in your code.
+
+2. `npx prisma db push`:
+
+- This command is used to push your Prisma schema changes to your database. It updates the database schema to match the changes in your Prisma schema.
