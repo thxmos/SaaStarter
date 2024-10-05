@@ -1,64 +1,16 @@
 "use server";
 
-import { SignUpSchema } from "./sign-up-form";
+import { SignUpSchema } from "../app/auth/sign-up-form";
 import { prisma } from "@/lib/prisma";
 import { Argon2id } from "oslo/password";
 import { lucia } from "@/lib/lucia";
 import { cookies } from "next/headers";
-import { SignInSchema } from "./sign-in-form";
+import { SignInSchema } from "../app/auth/sign-in-form";
 import { redirect } from "next/navigation";
 import { generateCodeVerifier, generateState } from "arctic";
 import { googleOAuthClient } from "@/lib/googleOauth";
-import { createVerificationToken } from "@/utils/createVerificationToken";
-import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
-import { createPasswordResetToken, sendPasswordResetEmail } from "./utils";
 import { Stripe } from "stripe";
-
-export const sendResetEmail = async (email: string) => {
-  try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return { error: "User not found", status: 404 };
-    }
-
-    const token = await createPasswordResetToken(user.id);
-
-    if (!token) {
-      return { error: "Couldn't create token", status: 500 };
-    }
-
-    const res = await sendPasswordResetEmail(
-      user.email,
-      token,
-      user.name ?? "",
-    );
-
-    if (res.status !== 200)
-      return { error: "Couldn't send email", status: 500 };
-
-    return { success: true };
-  } catch (error) {
-    return { error: "Something went wrong", status: 500 };
-  }
-};
-
-export const sendVerifyEmail = async (email: string) => {
-  if (!email) {
-    return { error: "Email is required", status: 400 };
-  }
-
-  const user = await prisma.user.findUnique({ where: { email } });
-
-  if (!user) {
-    return { error: "User not found", status: 404 };
-  }
-
-  const token = await createVerificationToken(user.id);
-  const res = await sendVerificationEmail(user.email, token, user.name ?? "");
-  if (res.status !== 200) return { error: "Couldn't send email", status: 500 };
-
-  return res;
-};
+import { sendVerifyEmail } from "@/actions/email.actions";
 
 export const signUp = async (values: SignUpSchema) => {
   const { email, name, password } = values;

@@ -1,11 +1,11 @@
 "use server";
 
 import { findUniqueUser } from "@/data-access/user";
-import { getUser, lucia } from "@/lib/lucia";
+import { getUser } from "@/lib/lucia";
 import { Price } from "@prisma/client";
 import Stripe from "stripe";
 
-export interface Subscription {
+export type Subscription = {
   id: string;
   currency: string;
   current_period_end: number;
@@ -14,36 +14,7 @@ export interface Subscription {
   start_date: number;
   billing_cycle: string;
   interval: string;
-}
-
-export async function getPrices(active: boolean = true) {
-  try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-    const prices = await stripe.prices.list({
-      active,
-      // limit: 10,
-      expand: ["data.product"], // This will include the associated product details
-    });
-
-    return {
-      success: true,
-      prices: prices.data.map((price) => ({
-        id: price.id,
-        unitAmount: price.unit_amount,
-        currency: price.currency,
-        type: price.type,
-        interval: price.recurring?.interval,
-      })),
-    };
-  } catch (error) {
-    console.error("Error fetching Stripe prices:", error);
-    return {
-      success: false,
-      error: "Failed to fetch prices. Please try again later.",
-    };
-  }
-}
+};
 
 export const createCheckoutSession = async (price: Price, quanity: number) => {
   try {

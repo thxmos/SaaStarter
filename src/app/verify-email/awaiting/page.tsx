@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Mail, AlertCircle, CheckCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { sendResetEmail } from "@/app/auth/auth.action";
+import { sendResetEmail } from "@/actions/email.actions";
 import React from "react";
 import { toast } from "sonner";
 
@@ -43,6 +43,8 @@ export default function AwaitingVerification({
 
     const email = emailInput.value;
 
+    //todo: when to use startTransition?
+    //todo: some action is sending toasts, i think the blob upload, make sure its in presentation layer
     startTransition(async () => {
       try {
         const result = await sendResetEmail(email);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { logout } from "@/app/auth/auth.action";
+import { logout } from "@/actions/auth.actions";
 import Link from "next/link";
 import {
   DropdownMenu as DropdownWrapper,

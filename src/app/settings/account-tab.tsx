@@ -25,11 +25,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import FileUpload, { FileType } from "@/components/file-upload";
-import { uploadBlob } from "@/actions/blob.actions";
-import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
 import { getInitials } from "@/helpers";
-import { findUniqueUser, updateUser } from "@/data-access/user";
-import { getUserAction } from "@/actions/lucia.actions";
+import { getUser, updateUserProfile, uploadAvatar } from "./account.actions";
 import { User } from "@prisma/client";
 
 const themes = [
@@ -44,21 +41,7 @@ const themes = [
 ];
 
 export default function AccountTab() {
-  const [user, setUser] = useState<User>();
-
-  useEffect(() => {
-    const fetch = async () => {
-      const { user: sessionUser, session } = await getUserAction();
-      if (sessionUser) {
-        const { user } = await findUniqueUser({
-          where: { id: sessionUser.id },
-        });
-        setUser(user);
-      }
-    };
-    fetch();
-  }, []);
-
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -68,65 +51,70 @@ export default function AccountTab() {
     user?.theme || themes[0].name,
   );
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await getUser();
+      setUser(userData ?? null);
+      setSelectedTheme(userData?.theme || themes[0].name);
+    };
+    fetchUser();
+  }, []);
+
   const handleAvatarUpload = async () => {
-    const isSessionValid = await isValidSession();
-    if (!isSessionValid) {
-      toast.error("Your session has expired. Please log in again.");
-      router.push("/login");
-      return;
-    }
     if (!avatarFile) {
       toast.error("Please select an image to upload.");
       return;
     }
+    setIsUploadingAvatar(true);
+
     const formData = new FormData();
     formData.append("file", avatarFile);
     formData.append("path", "avatars/");
-    setIsUploadingAvatar(true);
 
-    // Announce to screen readers that upload has started
-    const statusElement = document.getElementById("upload-status");
-    if (statusElement) {
-      statusElement.textContent = "Avatar upload started";
-      statusElement.setAttribute("aria-live", "polite");
-    }
-
-    const blob = await uploadBlob(formData);
-
-    if (blob) {
-      await updateUserAvatar(blob.url);
+    try {
+      const result = await uploadAvatar(formData);
+      if (result.success) {
+        setUser((prevUser) =>
+          prevUser ? { ...prevUser, avatar: result.avatarUrl } : null,
+        );
+        setIsModalOpen(false);
+        toast.success("Avatar uploaded successfully");
+      }
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to upload avatar",
+      );
+    } finally {
       setIsUploadingAvatar(false);
-      router.refresh();
-      setIsModalOpen(false);
-      await updateUser({ where: { id: user?.id }, data: { avatar: blob.url } });
-      toast.success("Avatar uploaded successfully");
-    } else {
-      setIsUploadingAvatar(false);
-      toast.error("Failed to upload avatar");
     }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     const formData = new FormData(event.currentTarget);
     formData.append("theme", selectedTheme);
 
     startTransition(async () => {
-      try {
-        await updateUser({
-          where: { id: user?.id },
-          data: { name: formData.get("name") as string, theme: selectedTheme },
-        });
-        toast.success("Successfully updated user");
-      } catch (error) {
-        console.error(error);
-        toast.error("An error occurred while updating user");
+      const result = await updateUserProfile(formData);
+      if (result.success) {
+        toast.success(result.message);
+        setUser((prevUser) =>
+          prevUser
+            ? {
+                ...prevUser,
+                name: formData.get("name") as string,
+                theme: selectedTheme,
+              }
+            : null,
+        );
+      } else {
+        toast.error(result.message);
       }
     });
   };
 
   if (!user) return null;
+
   return (
     <form onSubmit={handleSubmit}>
       <TabsContent value="account" className="space-y-4">

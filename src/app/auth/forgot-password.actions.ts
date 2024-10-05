@@ -35,6 +35,7 @@ export const createPasswordResetToken = async (userId: string) => {
     // Set token expiration to 24 hours from now
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+    //todo: move to persistence layer
     const res = await prisma.passwordResetToken.create({
       data: {
         token,
