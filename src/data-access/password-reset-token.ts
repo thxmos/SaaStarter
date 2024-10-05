@@ -1,7 +1,7 @@
 "use server";
-
 import { prisma } from "@/lib/prisma";
 import { PasswordResetToken } from "@prisma/client";
+import { generateTokenWithExpiration } from "@/utils/crypto.utils";
 
 type PasswordResetTokenDto = {
   id: string;
@@ -22,20 +22,14 @@ function toDtoMapper(
 }
 
 export async function createPasswordResetToken(
-  data: PasswordResetToken,
+  userId: string,
 ): Promise<PasswordResetTokenDto> {
-  const createdToken = await prisma.passwordResetToken.create({ data });
-  return toDtoMapper(createdToken);
-}
+  const { token, expiresAt } = generateTokenWithExpiration();
 
-export async function getPasswordResetTokenById(
-  id: string,
-): Promise<PasswordResetTokenDto> {
-  const foundToken = await prisma.passwordResetToken.findUnique({
-    where: { id },
+  const createdToken = await prisma.passwordResetToken.create({
+    data: { token, userId, expiresAt },
   });
-  if (!foundToken) throw new Error("Password reset token not found");
-  return toDtoMapper(foundToken);
+  return toDtoMapper(createdToken);
 }
 
 export async function getPasswordResetTokenByToken(
@@ -52,6 +46,7 @@ export async function deletePasswordResetToken(id: string): Promise<void> {
   await prisma.passwordResetToken.delete({ where: { id } });
 }
 
+//todo: run this in a cron job
 export async function deleteExpiredPasswordResetTokens(): Promise<void> {
   const now = new Date();
   await prisma.passwordResetToken.deleteMany({

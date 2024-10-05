@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { generateTokenWithExpiration } from "@/utils/crypto.utils";
 import { VerificationToken } from "@prisma/client";
 
 type VerificationTokenDto = {
@@ -22,20 +23,14 @@ function toDtoMapper(
 }
 
 export async function createVerificationToken(
-  data: VerificationToken,
+  userId: string,
 ): Promise<VerificationTokenDto> {
-  const createdToken = await prisma.verificationToken.create({ data });
-  return toDtoMapper(createdToken);
-}
+  const { token, expiresAt } = generateTokenWithExpiration();
 
-export async function getVerificationTokenById( //prob dont need this
-  id: string,
-): Promise<VerificationTokenDto> {
-  const foundToken = await prisma.verificationToken.findUnique({
-    where: { id },
+  const createdToken = await prisma.verificationToken.create({
+    data: { token, userId, expiresAt },
   });
-  if (!foundToken) throw new Error("Verification token not found");
-  return toDtoMapper(foundToken);
+  return toDtoMapper(createdToken);
 }
 
 export async function getVerificationTokenByToken(
@@ -52,6 +47,7 @@ export async function deleteVerificationToken(id: string): Promise<void> {
   await prisma.verificationToken.delete({ where: { id } });
 }
 
+//todo: run this in a cron job
 export async function deleteExpiredVerificationTokens(): Promise<void> {
   const now = new Date();
   await prisma.verificationToken.deleteMany({

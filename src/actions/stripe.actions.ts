@@ -37,7 +37,7 @@ export const createCheckoutSession = async (price: Price, quanity: number) => {
       quanity,
     );
 
-    return { success: true, sessionId: session.id };
+    return { success: true, sessionId: session.id }; // todo: can just return session.id
   } catch (error) {
     console.error("Error creating checkout session:", error);
     return { success: false };

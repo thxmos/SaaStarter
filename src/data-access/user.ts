@@ -74,6 +74,16 @@ export async function getUserByEmail(email: string): Promise<UserDto> {
   return toDtoMapper(foundUser);
 }
 
+export async function getUserByEmailWithPassword(email: string): Promise<User> {
+  const foundUser = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!foundUser) {
+    throw new Error("User not found with email: " + email);
+  }
+  return foundUser;
+}
+
 export async function updateUserById(
   id: string,
   data: Partial<User>,

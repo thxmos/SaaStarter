@@ -1,23 +1,14 @@
-import {
-  createPasswordResetToken,
-  sendPasswordResetEmail,
-} from "@/app/auth/forgot-password.actions";
-import { prisma } from "@/lib/prisma";
-import { createVerificationToken } from "@/utils/createVerificationToken";
-import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
+import { sendPasswordResetEmail } from "@/app/auth/forgot-password.actions";
+import { createPasswordResetToken } from "@/data-access/password-reset-token";
+import { getUserByEmail } from "@/data-access/user";
+import { createVerificationToken } from "@/data-access/verification-token";
+import { sendVerificationEmail } from "@/app/auth/send-verification.actions";
 
 export const sendResetEmail = async (email: string) => {
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return { error: "User not found", status: 404 };
-    }
+    const user = await getUserByEmail(email);
 
-    const token = await createPasswordResetToken(user.id);
-
-    if (!token) {
-      return { error: "Couldn't create token", status: 500 };
-    }
+    const { token } = await createPasswordResetToken(user.id);
 
     const res = await sendPasswordResetEmail(
       user.email,
@@ -35,18 +26,12 @@ export const sendResetEmail = async (email: string) => {
 };
 
 export const sendVerifyEmail = async (email: string) => {
-  if (!email) {
-    return { error: "Email is required", status: 400 };
-  }
+  const user = await getUserByEmail(email);
+  const { token } = await createVerificationToken(user.id);
 
-  const user = await prisma.user.findUnique({ where: { email } });
-
-  if (!user) {
-    return { error: "User not found", status: 404 };
-  }
-
-  const token = await createVerificationToken(user.id);
+  //todo: refactor email sending to a shared function
   const res = await sendVerificationEmail(user.email, token, user.name ?? "");
+
   if (res.status !== 200) return { error: "Couldn't send email", status: 500 };
 
   return res;

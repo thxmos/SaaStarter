@@ -1,8 +1,6 @@
 "use server";
 
 import { SignUpSchema } from "../app/auth/sign-up-form";
-import { prisma } from "@/lib/prisma";
-import { Argon2id } from "oslo/password";
 import { lucia } from "@/lib/lucia";
 import { cookies } from "next/headers";
 import { SignInSchema } from "../app/auth/sign-in-form";
@@ -10,19 +8,29 @@ import { redirect } from "next/navigation";
 import { generateCodeVerifier, generateState } from "arctic";
 import { googleOAuthClient } from "@/lib/googleOauth";
 import { sendVerifyEmail } from "@/actions/email.actions";
-import { hash } from "@/utils/crypto.utils";
-import { createUser, getUserByEmail } from "@/data-access/user";
+import { hash, verify } from "@/utils/crypto.utils";
+import {
+  createUser,
+  getUserByEmail,
+  getUserByEmailWithPassword,
+  updateUserById,
+} from "@/data-access/user";
 import { createStripeCustomer } from "@/data-access/stripe.customers";
+import {
+  deletePasswordResetToken,
+  getPasswordResetTokenByToken,
+} from "@/data-access/password-reset-token";
+import { deleteSession } from "@/data-access/session";
 
 export const signUp = async (values: SignUpSchema) => {
   const { email, name, password } = values;
   try {
+    // Check if user already exists
     const existingUser = await getUserByEmail(email);
-    if (existingUser) return { error: "User already exists", success: false };
+    if (existingUser) throw new Error("User already exists");
 
     const hashedPassword = await hash(password);
 
-    // Create user in the database
     const user = await createUser({
       email,
       name,
@@ -30,57 +38,36 @@ export const signUp = async (values: SignUpSchema) => {
     });
 
     // Create Stripe customer and update user with Stripe customer ID
-
-    if (!user.name || !user.email) {
-      console.error("Couldn't create Stripe customer: missing user data", user);
-    }
-
     const stripeCustomer = await createStripeCustomer(user.email);
+    await updateUserById(user.id, { stripeCustomerId: stripeCustomer.id });
 
-    if (stripeCustomer.id !== undefined) {
-      await updateUser(user.id, { stripeCustomerId: stripeCustomer.id });
-    } else {
-      console.error("Failed to create Stripe customer for user", user);
-    }
-
-    // Send verification email
-    const res = await sendVerifyEmail(user.email);
-
-    if (res.status !== 200) {
-      return { error: "Couldn't send email", success: false };
-    }
+    await sendVerifyEmail(user.email);
 
     return {
       user: { ...user, stripeCustomerId: stripeCustomer.id },
       success: true,
     };
   } catch (error) {
-    console.error("SignUp error:", error);
+    if (error instanceof Error) {
+      return { error: error.message, success: false };
+    }
     return { error: "Something went wrong", success: false };
   }
 };
 
 export const signIn = async (values: SignInSchema) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email: values.email.toLowerCase(),
-      },
-    });
+    // If no user password, then the user is not verified
+    const user = await getUserByEmailWithPassword(values.email);
+    if (!user.password) throw new Error("Please verify your email to login.");
 
-    if (!user || !user.password)
-      return { error: "Invalid Credentials", success: false };
+    // Check if the password is correct & the user is verified
+    const passwordMatch = await verify(user.password, values.password);
+    if (!passwordMatch) throw new Error("Invalid password");
+    if (!user.isVerified) throw new Error("Please verify your email to login.");
 
-    const passwordMatch = await new Argon2id().verify(
-      user.password,
-      values.password,
-    );
-    if (!passwordMatch) return { error: "Invalid Credentials", success: false };
-
-    if (!user.isVerified) {
-      return { error: "Please verify your email to login.", success: false };
-    }
-
+    // Create session & set cookie
+    // todo: abstract this
     const session = await lucia.createSession(user.id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
     cookies().set(
@@ -90,7 +77,10 @@ export const signIn = async (values: SignInSchema) => {
     );
     return { success: true };
   } catch (error) {
-    return { error: "Something went wrong", success: false };
+    if (error instanceof Error) {
+      return { error: error.message, success: false };
+    }
+    return { error: "An unknown error occurred", success: false };
   }
 };
 
@@ -98,11 +88,7 @@ export const logout = async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
   if (!sessionId) return redirect("/auth");
   try {
-    await prisma.session.delete({
-      where: {
-        id: sessionId,
-      },
-    });
+    await deleteSession(sessionId);
   } catch (error) {
     console.error("error logging out: ", error);
   }
@@ -147,39 +133,19 @@ export const getGoogleOauthConsentUrl = async () => {
 
 export async function resetPassword(token: string, password: string) {
   try {
-    if (!token || typeof token !== "string") {
-      return { message: "Invalid token", success: false };
-    }
+    const hashedPassword = await hash(password);
+    const resetToken = await getPasswordResetTokenByToken(token);
 
-    if (!password || typeof password !== "string") {
-      return { message: "Invalid password", success: false };
-    }
-
-    const hashedPassword = await new Argon2id().hash(password);
-
-    const resetToken = await prisma.passwordResetToken.findUnique({
-      where: { token },
-    });
-
-    if (!resetToken || new Date() > resetToken.expiresAt) {
+    if (new Date() > resetToken.expiresAt) {
       return { message: "Token is invalid or has expired", success: false };
     }
 
-    await prisma.user.update({
-      where: { id: resetToken.userId },
-      data: { password: hashedPassword },
-    });
-
-    await prisma.passwordResetToken.delete({
-      where: { id: resetToken.id },
-    });
+    await updateUserById(resetToken.userId, { password: hashedPassword });
+    await deletePasswordResetToken(resetToken.id);
 
     return { message: "Password successfully reset!", success: true };
   } catch (error) {
     console.error(error);
     return { message: "Something went wrong", success: false };
   }
-}
-function updateUser(id: string, arg1: { stripeCustomerId: string }) {
-  throw new Error("Function not implemented.");
 }
