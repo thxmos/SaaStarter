@@ -2,16 +2,15 @@
 "use server";
 
 import { getUserAction, isValidSession } from "@/actions/lucia.actions";
-import { findUniqueUser, updateUser } from "@/data-access/user";
 import { uploadBlob } from "@/actions/blob.actions";
 import { updateUserAvatar } from "@/actions/user.actions";
+import { getUserById, updateUserById } from "@/data-access/user";
 
-export async function getUser() {
-  const { user: sessionUser, session } = await getUserAction();
+// todo: do we really need this?
+export async function getUserData() {
+  const { user: sessionUser } = await getUserAction();
   if (sessionUser) {
-    const { user } = await findUniqueUser({
-      where: { id: sessionUser.id },
-    });
+    const user = await getUserById(sessionUser.id);
     return user;
   }
   return null;
@@ -28,10 +27,7 @@ export async function updateUserProfile(formData: FormData) {
   const theme = formData.get("theme") as string;
 
   try {
-    await updateUser({
-      where: { id: userId },
-      data: { name, theme },
-    });
+    await updateUserById(userId, { name, theme });
     return { success: true, message: "Successfully updated user" };
   } catch (error) {
     console.error(error);
@@ -59,6 +55,8 @@ export async function uploadAvatar(formData: FormData) {
     throw new Error("Failed to upload avatar");
   }
 }
+
+// OLD todo: read thru again and delete
 
 // const handleAvatarUpload = async (
 //   avatarFile: File,

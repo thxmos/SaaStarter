@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 
+//todo: add this to crypto utils and make it independent of prisma
 export const createVerificationToken = async (userId: string) => {
   const token = crypto.randomBytes(32).toString("hex");
 

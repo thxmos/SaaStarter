@@ -9,47 +9,36 @@ import { SignInSchema } from "../app/auth/sign-in-form";
 import { redirect } from "next/navigation";
 import { generateCodeVerifier, generateState } from "arctic";
 import { googleOAuthClient } from "@/lib/googleOauth";
-import { Stripe } from "stripe";
 import { sendVerifyEmail } from "@/actions/email.actions";
+import { hash } from "@/utils/crypto.utils";
+import { createUser, getUserByEmail } from "@/data-access/user";
+import { createStripeCustomer } from "@/data-access/stripe.customers";
 
 export const signUp = async (values: SignUpSchema) => {
   const { email, name, password } = values;
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
+    const existingUser = await getUserByEmail(email);
     if (existingUser) return { error: "User already exists", success: false };
 
-    const hashedPassword = await new Argon2id().hash(password);
+    const hashedPassword = await hash(password);
 
     // Create user in the database
-    const user = await prisma.user.create({
-      data: {
-        email: values.email.toLowerCase(),
-        name: values.name,
-        password: hashedPassword,
-      },
+    const user = await createUser({
+      email,
+      name,
+      password: hashedPassword,
     });
 
     // Create Stripe customer and update user with Stripe customer ID
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
     if (!user.name || !user.email) {
       console.error("Couldn't create Stripe customer: missing user data", user);
     }
 
-    const stripeCustomer = await stripe.customers.create({
-      email: email.toLowerCase(),
-      name: name,
-    });
+    const stripeCustomer = await createStripeCustomer(user.email);
 
     if (stripeCustomer.id !== undefined) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { stripeCustomerId: stripeCustomer.id },
-      });
+      await updateUser(user.id, { stripeCustomerId: stripeCustomer.id });
     } else {
       console.error("Failed to create Stripe customer for user", user);
     }
@@ -190,4 +179,7 @@ export async function resetPassword(token: string, password: string) {
     console.error(error);
     return { message: "Something went wrong", success: false };
   }
+}
+function updateUser(id: string, arg1: { stripeCustomerId: string }) {
+  throw new Error("Function not implemented.");
 }

@@ -28,48 +28,35 @@ export async function createVerificationToken(
   return toDtoMapper(createdToken);
 }
 
-export async function getVerificationTokens(): Promise<VerificationTokenDto[]> {
-  const tokens = await prisma.verificationToken.findMany();
-  return tokens.map(toDtoMapper);
-}
-
-export async function getVerificationTokenByIdentifier(
-  identifier: string,
-): Promise<VerificationTokenDto | null> {
+export async function getVerificationTokenById( //prob dont need this
+  id: string,
+): Promise<VerificationTokenDto> {
   const foundToken = await prisma.verificationToken.findUnique({
     where: { id },
   });
-  if (!foundToken) return null;
+  if (!foundToken) throw new Error("Verification token not found");
   return toDtoMapper(foundToken);
 }
 
 export async function getVerificationTokenByToken(
   token: string,
-): Promise<VerificationTokenDto | null> {
+): Promise<VerificationTokenDto> {
   const foundToken = await prisma.verificationToken.findUnique({
     where: { token },
   });
-  return foundToken ? toDtoMapper(foundToken) : null;
+  if (!foundToken) throw new Error("Verification token not found");
+  return toDtoMapper(foundToken);
 }
 
-export async function updateVerificationToken(
-  identifier: string,
-  data: Partial<VerificationToken>,
-): Promise<void> {
-  await prisma.verificationToken.update({ where: { identifier }, data });
-}
-
-export async function deleteVerificationToken(
-  identifier: string,
-): Promise<void> {
-  await prisma.verificationToken.delete({ where: { identifier } });
+export async function deleteVerificationToken(id: string): Promise<void> {
+  await prisma.verificationToken.delete({ where: { id } });
 }
 
 export async function deleteExpiredVerificationTokens(): Promise<void> {
   const now = new Date();
   await prisma.verificationToken.deleteMany({
     where: {
-      expires: {
+      expiresAt: {
         lt: now,
       },
     },

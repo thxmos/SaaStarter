@@ -1,9 +1,10 @@
 "use server";
 
-import { findUniqueUser } from "@/data-access/user";
+import { createStripeCheckoutSession } from "@/data-access/stripe.checkout.sessions";
+import { getStripeCustomer } from "@/data-access/stripe.customers";
+import { getUserById } from "@/data-access/user";
 import { getUser } from "@/lib/lucia";
 import { Price } from "@prisma/client";
-import Stripe from "stripe";
 
 export type Subscription = {
   id: string;
@@ -19,43 +20,22 @@ export type Subscription = {
 export const createCheckoutSession = async (price: Price, quanity: number) => {
   try {
     const { user: luciaUser } = await getUser();
-
     if (!luciaUser) {
-      console.error("Session user not found.");
-      return { success: false };
+      throw new Error("Session user not found.");
     }
-    const { user, error } = await findUniqueUser({
-      where: { id: luciaUser.id },
-      select: { stripeCustomerId: true },
-    });
 
+    const user = await getUserById(luciaUser.id);
     if (!user || !user.stripeCustomerId) {
-      console.error(error);
-      return {
-        success: false,
-      };
+      throw new Error("User not found or no stripe customer id");
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    const customer = await getStripeCustomer(user.stripeCustomerId);
 
-    const customer = await stripe.customers.retrieve(user.stripeCustomerId);
-
-    const session = await stripe.checkout.sessions.create({
-      success_url: `${process.env.NEXT_PUBLIC_URL}/dashboard`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL}/`,
-      line_items: [
-        {
-          price: price.stripePriceId!,
-          quantity: quanity,
-        },
-      ],
-      mode: "subscription",
-      customer: customer.id,
-    });
-
-    if (!session) {
-      return { success: false };
-    }
+    const session = await createStripeCheckoutSession(
+      customer.id,
+      price.stripePriceId!,
+      quanity,
+    );
 
     return { success: true, sessionId: session.id };
   } catch (error) {

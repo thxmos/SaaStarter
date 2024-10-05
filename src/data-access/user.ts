@@ -3,7 +3,15 @@
 import { prisma } from "@/lib/prisma";
 import { User } from "@prisma/client";
 
-type UserDto = {
+export type CreateUserDto = {
+  email: string;
+  password: string;
+  name?: string;
+  avatar?: string;
+  theme?: string;
+};
+
+export type UserDto = {
   id: string;
   email: string;
   name: string | null;
@@ -16,7 +24,7 @@ type UserDto = {
 function toDtoMapper(user: User): UserDto {
   return {
     id: user.id,
-    email: user.email,
+    email: user.email.toLowerCase(),
     name: user.name,
     avatar: user.avatar,
     theme: user.theme,
@@ -25,7 +33,7 @@ function toDtoMapper(user: User): UserDto {
   };
 }
 
-export async function createUser(data: User): Promise<UserDto> {
+export async function createUser(data: CreateUserDto): Promise<UserDto> {
   const createdUser = await prisma.user.create({ data });
   return toDtoMapper(createdUser);
 }
@@ -44,6 +52,16 @@ export async function getUserById(id: string): Promise<UserDto> {
     throw new Error("User not found with id: " + id);
   }
   return toDtoMapper(foundUser);
+}
+
+export async function getUserByIdWithPassword(id: string): Promise<User> {
+  const foundUser = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!foundUser) {
+    throw new Error("User not found with id: " + id);
+  }
+  return foundUser;
 }
 
 export async function getUserByEmail(email: string): Promise<UserDto> {

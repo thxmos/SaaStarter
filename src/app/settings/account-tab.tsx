@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -26,23 +25,16 @@ import {
 } from "@/components/ui/dialog";
 import FileUpload, { FileType } from "@/components/file-upload";
 import { getInitials } from "@/helpers";
-import { getUser, updateUserProfile, uploadAvatar } from "./account.actions";
-import { User } from "@prisma/client";
-
-const themes = [
-  { name: "light", color: "#ffffff" },
-  { name: "dark", color: "#1f2937" },
-  { name: "blue", color: "#3b82f6" },
-  { name: "green", color: "#10b981" },
-  { name: "purple", color: "#8b5cf6" },
-  { name: "orange", color: "#f97316" },
-  { name: "pink", color: "#ec4899" },
-  { name: "teal", color: "#14b8a6" },
-];
+import {
+  getUserData,
+  updateUserProfile,
+  uploadAvatar,
+} from "./account.actions";
+import { UserDto } from "@/data-access/user";
+import { themes } from "@/constants";
 
 export default function AccountTab() {
-  const [user, setUser] = useState<User | null>(null);
-  const router = useRouter();
+  const [user, setUser] = useState<UserDto | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,7 +45,7 @@ export default function AccountTab() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userData = await getUser();
+      const userData = await getUserData();
       setUser(userData ?? null);
       setSelectedTheme(userData?.theme || themes[0].name);
     };
@@ -112,8 +104,6 @@ export default function AccountTab() {
       }
     });
   };
-
-  if (!user) return null;
 
   return (
     <form onSubmit={handleSubmit}>
