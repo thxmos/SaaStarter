@@ -1,79 +1,75 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { cache } from "react";
-import { Prisma, User } from "@prisma/client";
+import { User } from "@prisma/client";
 
-export const createUser = async (
-  options: Prisma.UserCreateArgs,
-): Promise<{ success?: boolean; user?: User; error?: string }> => {
-  try {
-    const createdUser = await prisma.user.create({
-      ...options,
-    });
-    return { success: true, user: createdUser };
-  } catch (error) {
-    console.error("Failed to create user", error);
-    return { error: "Failed to create user" };
-  }
+type UserDto = {
+  id: string;
+  email: string;
+  name: string | null;
+  avatar: string | null;
+  theme: string | null;
+  isVerified: boolean;
+  stripeCustomerId: string | null;
 };
 
-export const findUsers = cache(
-  async (
-    options?: Prisma.UserFindManyArgs,
-  ): Promise<{ success?: boolean; users?: User[]; error?: string }> => {
-    try {
-      const foundUsers = await prisma.user.findMany({ ...options });
-      return { success: true, users: foundUsers };
-    } catch (error) {
-      console.error(`Failed to find users`, error);
-      return { error: "Failed to fetch users" };
-    }
-  },
-);
+function toDtoMapper(user: User): UserDto {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    avatar: user.avatar,
+    theme: user.theme,
+    isVerified: user.isVerified,
+    stripeCustomerId: user.stripeCustomerId,
+  };
+}
 
-export const findUniqueUser = cache(
-  async (
-    options: Prisma.UserFindUniqueArgs,
-  ): Promise<{ success?: boolean; user?: User; error?: string }> => {
-    try {
-      const foundUser = await prisma.user.findUnique({
-        ...options,
-      });
-      if (!foundUser) return { error: "User not found" };
-      return {
-        success: true,
-        user: foundUser,
-      };
-    } catch (error) {
-      console.error("Failed to find user with options", options, error);
-      return { error: "Failed to fetch user" };
-    }
-  },
-);
+export async function createUser(data: User): Promise<UserDto> {
+  const createdUser = await prisma.user.create({ data });
+  return toDtoMapper(createdUser);
+}
 
-export const updateUser = async (
-  options: Prisma.UserUpdateArgs,
-): Promise<{ success?: boolean; user?: User; error?: string }> => {
-  try {
-    const updatedUser = await prisma.user.update({
-      ...options,
-    });
-    return { success: true, user: updatedUser };
-  } catch (error) {
-    console.error("Failed to update user", error);
-    return { error: "Failed to update user" };
+export async function getUsers(): Promise<UserDto[]> {
+  //use cache or no?
+  const users = await prisma.user.findMany();
+  return users.map(toDtoMapper);
+}
+
+export async function getUserById(id: string): Promise<UserDto> {
+  const foundUser = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!foundUser) {
+    throw new Error("User not found with id: " + id);
   }
-};
+  return toDtoMapper(foundUser);
+}
 
-export const deleteUser = async (
-  options: Prisma.UserDeleteArgs,
-): Promise<{ success?: boolean; user?: User; error?: string }> => {
-  try {
-    const deletedUser = await prisma.user.delete({ ...options });
-    return { success: true, user: deletedUser };
-  } catch (error) {
-    console.error("Failed to delete user", error);
-    return { error: "Failed to delete user" };
+export async function getUserByEmail(email: string): Promise<UserDto> {
+  const foundUser = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!foundUser) {
+    throw new Error("User not found with email: " + email);
   }
-};
+  return toDtoMapper(foundUser);
+}
+
+export async function updateUserById(
+  id: string,
+  data: Partial<User>,
+): Promise<void> {
+  await prisma.user.update({ where: { id }, data });
+}
+
+export async function updateUserByEmail(
+  email: string,
+  data: Partial<User>,
+): Promise<void> {
+  await prisma.user.update({ where: { email }, data });
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  await prisma.user.delete({ where: { id } });
+}

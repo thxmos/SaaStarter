@@ -3,39 +3,34 @@ import { redirect } from "next/navigation";
 import VerificationStatus from "./verification-status";
 import { verifyEmail } from "./verify-email.action";
 import { getUser } from "@/lib/lucia";
-import { findUniqueUser } from "@/data-access/user";
+import { getUserById } from "@/data-access/user";
 
 export default async function VerifyEmail({
   searchParams,
 }: {
   searchParams: { token?: string };
 }) {
-  let message =
-    "We're sorry, but something went wrong during the email verification process. The verification link may have expired or is invalid.";
-
-  const { user: luciaUser } = await getUser();
-  const { user } = await findUniqueUser({
-    where: { id: luciaUser?.id },
-    select: { isVerified: true },
-  });
-  let isVerified = user?.isVerified ?? false;
-
-  if (isVerified) {
-    redirect("/dashboard");
-  }
-
+  // If token is not provided, redirect to auth page
   const token = searchParams.token;
-
   if (!token) {
     redirect("/auth");
   }
 
-  const res = await verifyEmail(token);
-
-  if (res.success) {
-    isVerified = true;
-    message = res.message!;
+  // Check user isnt verified already
+  const { user: luciaUser } = await getUser();
+  if (luciaUser) {
+    // If user is already verified, redirect to dashboard
+    const user = await getUserById(luciaUser.id);
+    let isVerified = user?.isVerified ?? false;
+    if (isVerified) {
+      redirect("/dashboard");
+    }
   }
+
+  let message =
+    "We're sorry, but something went wrong during the email verification process. The verification link may have expired or is invalid.";
+
+  const res = await verifyEmail(token);
 
   return (
     <main
@@ -52,7 +47,7 @@ export default async function VerifyEmail({
       >
         <VerificationStatus
           message={message}
-          isVerified={isVerified}
+          isVerified={res.success}
           aria-live="polite"
           aria-atomic="true"
         />
