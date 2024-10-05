@@ -1,6 +1,6 @@
-import BeanMachineTab from "./home/bean-machine-tab";
+import BeanMachineTab from "./bean-machine-tab";
 
-export default function Dashboard({}) {
+const DashboardHome = () => {
   return (
     <main className="flex-1 p-8 overflow-y-auto bg-background">
       <div className="w-full max-w-5xl">
@@ -8,4 +8,6 @@ export default function Dashboard({}) {
       </div>
     </main>
   );
-}
+};
+
+export default DashboardHome;
