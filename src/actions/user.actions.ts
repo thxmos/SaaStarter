@@ -4,6 +4,7 @@ import { getUser, lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { del } from "@vercel/blob";
+import { updateUser } from "@/data-access/user";
 
 export const updateUserAvatar = async (url: string) => {
   const { user } = await getUser();
@@ -19,10 +20,16 @@ export const updateUserAvatar = async (url: string) => {
       await del(blobUrl.avatar);
     }
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await updateUser({
       where: { id: user.id },
       data: { avatar: url },
     });
+    if (!updatedUser.success) {
+      console.error(updatedUser.error);
+      return {
+        success: false,
+      };
+    }
     return {
       success: true,
     };
