@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { Button } from "../ui/button";
 
@@ -22,9 +20,7 @@ const SubscribeSection = () => {
           </div>
           <div className="w-full max-w-sm space-y-2">
             <Link href="/auth">
-              <Button className="bg-white text-black hover:bg-gray-200">
-                Get Started
-              </Button>
+              <Button>Get Started</Button>
             </Link>
           </div>
         </div>

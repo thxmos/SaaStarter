@@ -28,12 +28,6 @@ const features = [
 ];
 
 export default function FeaturesSection() {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
   return (
     <section
       id="features"
@@ -45,21 +39,20 @@ export default function FeaturesSection() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <AnimatePresence>
-            {isMounted &&
-              features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  className="flex flex-col items-center text-center bg-card p-6 rounded-lg shadow-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <feature.icon className="h-12 w-12 mb-4 text-primary" />
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </motion.div>
-              ))}
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                className="flex flex-col items-center text-center bg-card p-6 rounded-lg shadow-lg"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.1 }}
+                whileHover={{ scale: 1.02 }}
+              >
+                <feature.icon className="h-12 w-12 mb-4 text-primary" />
+                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                <p className="text-muted-foreground">{feature.description}</p>
+              </motion.div>
+            ))}
           </AnimatePresence>
         </div>
       </div>

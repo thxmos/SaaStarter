@@ -17,7 +17,10 @@ export type Subscription = {
   interval: string;
 };
 
-export const createCheckoutSession = async (price: Price, quanity: number) => {
+export const createCheckoutSession = async (
+  price: Price,
+  quanity: number,
+): Promise<{ success: boolean; sessionId?: string }> => {
   try {
     const { user: luciaUser } = await getUser();
     if (!luciaUser) {

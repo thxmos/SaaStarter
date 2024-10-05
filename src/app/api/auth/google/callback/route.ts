@@ -94,10 +94,10 @@ export async function GET(req: NextRequest, res: Response) {
       sessionCookie.value,
       sessionCookie.attributes,
     );
-
-    return redirect("/dashboard");
-  } catch (error) {
-    console.error("api/auth/google/callback: error", error);
+  } catch (error: any) {
+    console.error("api/auth/google/callback: error", error.message);
     return new Response("Internal server error", { status: 500 });
+  } finally {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 }

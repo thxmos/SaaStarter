@@ -15,6 +15,8 @@ import { Price, Product } from "@prisma/client";
 import { Check } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
+import { useState } from "react";
+import { BeatLoader } from "react-spinners";
 
 interface Props {
   price: Price;
@@ -29,23 +31,24 @@ const PricingCard: React.FC<Props> = ({
   features,
   highlighted,
 }) => {
-  const handleCheckout = async () => {
-    const { success, sessionId } = await createCheckoutSession(price, 1);
+  const [isBusy, setIsBusy] = useState(false);
 
+  const handleCheckout = async () => {
+    setIsBusy(true);
+    const { success, sessionId } = await createCheckoutSession(price, 1);
     if (!success || !sessionId) {
       toast.error("Failed to create checkout session, try again.");
       return;
     }
-
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
-
     stripe?.redirectToCheckout({ sessionId });
+    setIsBusy(false);
   };
 
   return (
     <Card
       className={`flex flex-col min-w-[300px] min ${
-        highlighted ? "border-blue-500 border-2" : ""
+        highlighted ? "border-primary border-2" : ""
       }`}
       aria-labelledby={`pricing-plan-${product.id}`}
     >
@@ -87,8 +90,9 @@ const PricingCard: React.FC<Props> = ({
           className="w-full"
           variant={highlighted ? "default" : "outline"}
           aria-label={`Subscribe to ${product.name} plan`}
+          disabled={isBusy}
         >
-          Subscribe
+          {isBusy ? <BeatLoader size={10} /> : "Subscribe"}
         </Button>
       </CardFooter>
     </Card>
