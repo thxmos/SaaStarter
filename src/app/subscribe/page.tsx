@@ -1,3 +1,4 @@
+import { getUserSubscriptions } from "@/actions/user.actions";
 import PricingCard from "./pricing-card";
 import ProtectedLayout from "@/components/protected-layout";
 import { APP_NAME } from "@/constants";
@@ -6,6 +7,8 @@ import { findProducts } from "@/data-access/stripe.products";
 import { getUser } from "@/lib/lucia";
 import { Price, Product } from "@prisma/client";
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface Plan {
   price: Price;
@@ -22,9 +25,9 @@ const MOCK_FEATURES = [
 ];
 
 const SubscribePage = async () => {
-  const { session } = await getUser();
+  const subscriptions = await getUserSubscriptions();
 
-  if (!session) redirect("/auth");
+  if (subscriptions) return <IsSubscribed />;
 
   const { prices } = await findPrices();
   const { products } = await findProducts();
@@ -73,6 +76,34 @@ const SubscribePage = async () => {
             ) : (
               <p role="alert">No products are currently available.</p>
             )}
+          </section>
+        </main>
+      </div>
+    </ProtectedLayout>
+  );
+};
+
+const IsSubscribed = async () => {
+  return (
+    <ProtectedLayout>
+      <div className="min-h-screen bg-background">
+        <main className="container mx-auto px-4 py-16">
+          <header className="text-center mb-16">
+            <h1 className="text-4xl font-bold mb-4 text-foreground">
+              You already have an active subscription.
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              head to your dashboard to manage your subscription.
+            </p>
+          </header>
+
+          <section
+            aria-label="Actions"
+            className="flex flex-col items-center md:items-start md:justify-center gap-4 md:flex-row"
+          >
+            <Link href="/dashboard">
+              <Button>Go to Dashboard</Button>
+            </Link>
           </section>
         </main>
       </div>

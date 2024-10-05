@@ -45,3 +45,19 @@ export const isValidSession = async () => {
 
   return true;
 };
+
+export const getUserSubscriptions = async () => {
+  const { user } = await getUser();
+  if (!user) return null;
+
+  const data = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      subscriptions: true,
+    },
+  });
+
+  if (!data || data.subscriptions.length === 0) return null;
+
+  return data.subscriptions;
+};
