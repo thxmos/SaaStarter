@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { sendResetEmail } from "./auth.action";
 import { toast } from "sonner";
 import {
   Form,
@@ -15,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BeatLoader } from "react-spinners";
+import { sendResetEmail } from "@/actions/email.actions";
 
 const resetPasswordSchema = z.object({
   email: z.string().email(),

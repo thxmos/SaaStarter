@@ -7,8 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User
 model User {
-  id    String  @id @default(cuid())
+  id    String  @id @default(cuid()) 
   email String  @unique
   name  String?
 
@@ -19,12 +20,13 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  stripeCustomerId String? @unique
+  stripeCustomerId String? @unique 
 
   session       Session[]
   subscriptions Price[]   @relation("UserSubscriptions")
 }
 
+// Authentication & Verification
 model Session {
   id        String   @id
   userId    String
@@ -37,18 +39,17 @@ model VerificationToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  expiresAt DateTime @default(dbgenerated("NOW() + INTERVAL '1 day'"))
 }
 
 model PasswordResetToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String
-  createdAt DateTime @default(now())
-  expiresAt DateTime
+  expiresAt DateTime @default(dbgenerated("NOW() + INTERVAL '1 day'"))
 }
 
+// Price
 model Price {
   id              String               @id @default(cuid())
   stripePriceId   String?              @unique
@@ -67,18 +68,6 @@ model Price {
   users     User[]   @relation("UserSubscriptions")
 }
 
-model Product {
-  id              String   @id @default(cuid())
-  name            String?
-  description     String?
-  image           String?
-  active          Boolean?
-  metadata        Json?
-  stripeProductId String?  @unique
-
-  prices Price[]
-}
-
 enum PricingType {
   RECURRING
   ONE_TIME
@@ -89,4 +78,17 @@ enum PricingPlanInterval {
   WEEK
   MONTH
   YEAR
+}
+
+// Product
+model Product {
+  id              String   @id @default(cuid())
+  name            String?
+  description     String?
+  image           String?
+  active          Boolean?
+  metadata        Json?
+  stripeProductId String?  @unique
+
+  prices Price[]
 }

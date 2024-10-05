@@ -21,6 +21,7 @@ export const sendVerificationEmail = async (
       subject: `Verify your account - ${APP_NAME}`,
       react: WelcomeEmail({ url: verificationUrl, name }),
     });
+
     if (res.error) return { ...res.error };
     return { message: "Verification email sent.", status: 200 };
   } catch (error) {

@@ -2,9 +2,7 @@
 
 import { APP_NAME } from "@/constants";
 import PasswordResetEmail from "@/emails/password-reset";
-import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
-import crypto from "crypto";
 
 export const sendPasswordResetEmail = async (
   email: string,
@@ -26,28 +24,4 @@ export const sendPasswordResetEmail = async (
   });
   if (res.error) return { ...res.error };
   return { message: "Verification email sent.", status: 200 };
-};
-
-export const createPasswordResetToken = async (userId: string) => {
-  try {
-    const token = crypto.randomBytes(32).toString("hex");
-
-    // Set token expiration to 24 hours from now
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-
-    const res = await prisma.passwordResetToken.create({
-      data: {
-        token,
-        userId,
-        expiresAt,
-      },
-    });
-
-    console.log("Token created", res, token);
-
-    return token;
-  } catch (error) {
-    console.error("Couldn't create token", error);
-    return null;
-  }
 };

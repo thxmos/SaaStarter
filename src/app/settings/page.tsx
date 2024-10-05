@@ -37,6 +37,9 @@ export default function UserSettings({
 
   const [activeTab, setActiveTab] = useState(searchParams.tab || tabs[0].key);
 
+  // TODO: add the tabs in the sidebar / layout component
+  // delete the layout in this directory
+
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}

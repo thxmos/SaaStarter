@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { useTransition, useRef, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { passwordReset } from "./settings.action";
+import { passwordReset } from "./settings.actions";
 import { SessionUser } from "@/lib/lucia";
 import { getUserAction } from "@/actions/lucia.actions";
 

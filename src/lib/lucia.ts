@@ -2,6 +2,7 @@ import { Lucia } from "lucia";
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { prisma } from "./prisma";
 import { cookies } from "next/headers";
+import { getUserById } from "@/data-access/user";
 
 export interface SessionUser {
   id: string;
@@ -48,15 +49,7 @@ export const getUser = async () => {
       );
     }
 
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user?.id },
-      select: {
-        id: true,
-        name: true,
-        avatar: true,
-        theme: true,
-      },
-    });
+    const dbUser = await getUserById(user.id);
 
     return { user: dbUser as SessionUser, session: session };
   } catch (error) {

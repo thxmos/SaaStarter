@@ -1,8 +1,8 @@
 import PricingCard from "./pricing-card";
 import ProtectedLayout from "@/components/protected-layout";
 import { APP_NAME } from "@/constants";
-import { findPrices } from "@/data-access/stripe.prices";
-import { findProducts } from "@/data-access/stripe.products";
+import { findPrices } from "@/data-access/price";
+import { findProducts } from "@/data-access/product";
 import { Price, Product } from "@prisma/client";
 
 interface Plan {
@@ -25,7 +25,7 @@ const SubscribePage = async () => {
 
   const plans = prices
     ?.map((price) => {
-      const product = products.find(
+      const product = products?.find(
         (p) => p.stripeProductId === price.stripeProductId,
       );
       if (!product) return null;
