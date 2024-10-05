@@ -69,3 +69,11 @@ The command `npx sst bind npx prisma db push` is a combination of two separate c
 2. `npx prisma db push`:
 
 - This command is used to push your Prisma schema changes to your database. It updates the database schema to match the changes in your Prisma schema.
+
+transactions and use cases
+
+- https://www.youtube.com/watch?v=od3kAD4V9a4
+
+Email
+
+- https://www.youtube.com/watch?v=d9JrOgLE8DE
