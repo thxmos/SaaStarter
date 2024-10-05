@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "sonner";
-import Navbar from "@/components/nav-bar";
+import Navbar from "@/components/navbar/nav-bar";
 import { getUser } from "@/lib/lucia";
 import { ThemeProvider } from "@/components/theme-provider";
 import { APP_DESCRIPTION, APP_NAME } from "@/constants";
@@ -29,7 +29,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { user } = await getUser();
-  //TODO: apply user layout
 
   return (
     <html lang="en">
@@ -38,6 +37,7 @@ export default async function RootLayout({
       >
         <ThemeProvider
           attribute="class"
+          // defaultTheme={"pink"}
           defaultTheme={user?.theme || "bean"}
           enableSystem
           disableTransitionOnChange

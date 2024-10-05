@@ -1,26 +1,11 @@
-"use client";
-
 import Link from "next/link";
 import { Cpu } from "lucide-react";
 import { APP_NAME } from "@/constants";
-import LoginButton from "./login-button";
 import DropdownMenu from "./dropdown-menu";
-import { Suspense, useEffect, useState } from "react";
-import { SessionUser } from "@/lib/lucia";
-import { getUserAction } from "@/actions/lucia.actions";
+import { getUser } from "@/lib/lucia";
 
-const Navbar = () => {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<SessionUser | null>(null);
-
-  useEffect(() => {
-    const fetch = async () => {
-      const { user, session } = await getUserAction();
-      setUser(user);
-      setLoading(false);
-    };
-    fetch();
-  }, []);
+const Navbar = async () => {
+  const { user } = await getUser();
 
   const navLinks = [
     {
@@ -50,7 +35,7 @@ const Navbar = () => {
         <Cpu className="h-6 w-6 text-primary" aria-hidden="true" />
         <span className="sr-only">{APP_NAME}</span>
       </Link>
-      {!loading && (
+      {
         <nav
           className="ml-auto flex gap-4 sm:gap-6 items-center"
           aria-label="Main navigation"
@@ -66,10 +51,20 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-          <DropdownMenu user={user} />
-          <LoginButton user={user} />
+
+          {/* Login Button / User Menu */}
+          {user ? (
+            <DropdownMenu user={user} />
+          ) : (
+            <Link
+              href="/auth"
+              className="text-sm font-medium hover:underline underline-offset-4"
+            >
+              Log In
+            </Link>
+          )}
         </nav>
-      )}
+      }
     </header>
   );
 };
