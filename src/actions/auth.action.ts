@@ -15,6 +15,7 @@ import { createUser, getUserByEmail, updateUserById } from "@/data-access/user";
 import { sendVerifyEmail } from "./email.actions";
 import { hash } from "@/utils/crypto.utils";
 import { getPasswordResetTokenByToken } from "@/data-access/password-reset-token";
+import { deleteSession } from "@/data-access/sessions";
 
 export const signUp = async (values: SignUpSchema) => {
   const { email, name, password } = values;
@@ -92,15 +93,7 @@ export const signIn = async (values: SignInSchema) => {
 export const logout = async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
   if (!sessionId) return redirect("/auth");
-  try {
-    await prisma.session.delete({
-      where: {
-        id: sessionId,
-      },
-    });
-  } catch (error) {
-    console.error("error logging out: ", error);
-  }
+  await deleteSession(sessionId);
 
   const sessionCookie = lucia.createBlankSessionCookie();
   cookies().set(
@@ -108,7 +101,7 @@ export const logout = async () => {
     sessionCookie.value,
     sessionCookie.attributes,
   );
-  return redirect("/auth");
+  return redirect("/");
 };
 
 export const getGoogleOauthConsentUrl = async () => {

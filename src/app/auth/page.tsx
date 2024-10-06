@@ -1,4 +1,4 @@
-import TabSwitcher from "@/components/tab-switcher";
+import TabSwitcher from "./_components/tab-switcher";
 import SignInForm from "./_components/sign-in-form";
 import SignUpForm from "./_components/sign-up-form";
 import { redirect } from "next/navigation";
