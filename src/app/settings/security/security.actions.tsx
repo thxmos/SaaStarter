@@ -1,7 +1,7 @@
 "use server";
 
 import { getUserByIdWithPassword, updateUserById } from "@/data-access/user";
-import * as argon2 from "argon2";
+import { hash, verify } from "@/utils/crypto.utils";
 
 export async function passwordReset(formData: FormData, userId: string) {
   const currentPassword = formData.get("currentPassword") as string;
@@ -18,24 +18,27 @@ export async function passwordReset(formData: FormData, userId: string) {
   try {
     const user = await getUserByIdWithPassword(userId);
 
-    const isCurrentPasswordValid = await argon2.verify(
-      user.password!,
-      currentPassword,
-    );
+    if (!user.password) {
+      throw new Error(
+        "Authenticated via 3rd party. Cannot change password at this time",
+      );
+    }
+
+    const isCurrentPasswordValid = await verify(user.password, currentPassword);
+
     if (!isCurrentPasswordValid) {
       throw new Error("Current password is incorrect");
     }
 
-    const hashedPassword = await argon2.hash(newPassword);
+    const hashedPassword = await hash(newPassword);
 
     await updateUserById(userId, { password: hashedPassword });
 
     return { success: true, message: "Password updated successfully" };
   } catch (error) {
-    console.error("Password reset error:", error);
     return {
       success: false,
-      message: "An error occurred during password reset",
+      message: error,
     };
   }
 }

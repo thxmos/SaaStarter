@@ -11,51 +11,25 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useTransition, useRef, useEffect, useState } from "react";
+import React, { useTransition, useRef } from "react";
 import { toast } from "sonner";
-import { passwordReset } from "./settings.action";
+import { passwordReset } from "./security.actions";
 import { SessionUser } from "@/lib/lucia";
-import { getUserAction } from "@/actions/lucia.actions";
 
-export default function SecurityTab() {
+export default function SecurityTab({ user }: { user: SessionUser }) {
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
-  const [user, setUser] = useState<SessionUser | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const { user } = await getUserAction();
-        setUser(user);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-        toast.error("Failed to load user data");
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
-    if (!user) {
-      toast.error("User data not available");
-      return;
-    }
-
     startTransition(async () => {
       try {
-        const result = await passwordReset(formData, user.id);
-        if (result.success) {
-          toast.success(result.message);
-          formRef.current?.reset();
-        } else {
-          throw new Error(result.message);
-        }
+        await passwordReset(formData, user.id);
+        toast.success("Successfully updated password");
+        formRef.current?.reset();
       } catch (error) {
-        console.error(error);
         toast.error("An error occurred while updating the password");
       }
     });

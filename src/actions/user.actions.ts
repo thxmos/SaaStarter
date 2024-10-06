@@ -30,18 +30,6 @@ export const updateUserAvatar = async (url: string) => {
   }
 };
 
-export const isValidSession = async () => {
-  const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
-
-  if (!sessionId) return false;
-
-  const { user, session } = await lucia.validateSession(sessionId);
-
-  if (!session) return false;
-
-  return true;
-};
-
 export const getUserSubscriptions = async () => {
   const { user } = await getUser();
   if (!user) return null;

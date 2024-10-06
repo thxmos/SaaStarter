@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Download } from "lucide-react";
 import Link from "next/link";
+import { SessionUser } from "@/lib/lucia";
 
 const mockBillingHistory = [
   {
@@ -25,7 +27,7 @@ const mockBillingHistory = [
   },
 ];
 
-const BillingTab: React.FC = () => {
+export default function BillingTab({ user }: { user: SessionUser }) {
   return (
     <Card className="w-full">
       <CardHeader>
@@ -71,6 +73,4 @@ const BillingTab: React.FC = () => {
       </CardFooter>
     </Card>
   );
-};
-
-export default BillingTab;
+}

@@ -1,20 +1,20 @@
 import React from "react";
-import { getUser } from "@/lib/lucia";
-import { redirect } from "next/navigation";
 import ProtectedLayout from "@/components/protected-layout";
+import SettingsLayoutSidebar from "./layout.sidebar";
 
 interface Props {
   children: React.ReactNode;
 }
 
 const SettingsLayout: React.FC<Props> = async ({ children }) => {
-  const { user, session } = await getUser();
-
-  if (!user || !session) {
-    redirect("/");
-  }
-
-  return <ProtectedLayout>{children}</ProtectedLayout>;
+  return (
+    <ProtectedLayout redirectUrl="/auth">
+      <div className="flex h-screen bg-background">
+        <SettingsLayoutSidebar />
+        {children}
+      </div>
+    </ProtectedLayout>
+  );
 };
 
 export default SettingsLayout;
