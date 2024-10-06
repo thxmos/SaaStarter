@@ -34,7 +34,7 @@ const DashboardLayout: React.FC<Props> = async ({ children }) => {
           </div>
           <nav>
             {tabs.map((tab) => (
-              <Link href={tab.href}>
+              <Link href={tab.href} key={tab.key}>
                 <Button key={tab.key} className="w-full justify-start mb-2">
                   {tab.icon}
                   {tab.label}
