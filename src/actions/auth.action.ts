@@ -167,8 +167,6 @@ export async function resetPassword(token: string, password: string) {
       where: { id: resetToken.id },
     });
 
-    // revalidatePath("/dashboard");
-
     return { message: "Password successfully reset!", success: true };
   } catch (error) {
     console.error(error);
