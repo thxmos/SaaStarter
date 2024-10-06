@@ -5,7 +5,6 @@ import {
   deleteVerificationToken,
   getVerificationTokenByToken,
 } from "@/data-access/verification-token";
-import { prisma } from "@/lib/prisma";
 
 export async function verifyEmail(token: string) {
   try {
