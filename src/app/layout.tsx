@@ -51,9 +51,11 @@ export default async function RootLayout({
           themes={themes}
           disableTransitionOnChange
         >
-          <Navbar />
-          <Toaster richColors />
-          {children}
+          <div className="max-h-screen">
+            <Navbar />
+            <Toaster richColors />
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>

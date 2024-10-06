@@ -1,3 +1,4 @@
+import React from "react";
 import { getUser } from "@/lib/lucia";
 import { redirect } from "next/navigation";
 

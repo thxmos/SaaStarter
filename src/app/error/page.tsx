@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
 
-export default function NotFound() {
+export default function ErrorPage() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <Card className="w-[350px] max-w-[90%]">
         <CardHeader>
           <div className="flex items-center justify-center mb-4">
-            <AlertTriangle className="h-12 w-12 text-yellow-500" />
+            <AlertTriangle className="h-12 w-12 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold text-center">
             404 - Page Not Found

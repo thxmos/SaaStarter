@@ -17,7 +17,7 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { resetPassword } from "@/actions/auth.action";
 
-export default function PasswordResetPage() {
+export default function ResetPasswordPage() {
   const [status, setStatus] = useState<{
     type: "idle" | "error" | "success";
     message: string;

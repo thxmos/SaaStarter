@@ -41,6 +41,7 @@ const PricingCard: React.FC<Props> = ({
       price,
       1,
     );
+
     if (!success || !sessionId) {
       if (message) {
         toast.error(message);
@@ -65,7 +66,7 @@ const PricingCard: React.FC<Props> = ({
       <CardHeader>
         <CardTitle
           id={`pricing-plan-${product.id}`}
-          className="text-2xl font-bold"
+          className="text-2xl font-bold "
         >
           {product.name}
         </CardTitle>
