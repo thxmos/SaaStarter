@@ -21,7 +21,12 @@ model User {
   stripeCustomerId String? @unique
 
   session       Session[]
-  subscriptions Price[]   @relation("UserSubscriptions")
+  subscriptions Price[]        @relation("UserSubscriptions")
+  oAuthProvider OAuthProvider?
+}
+
+enum OAuthProvider {
+  GOOGLE
 }
 
 model Session {
