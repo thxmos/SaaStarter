@@ -1,5 +1,4 @@
 import { cache } from "react";
-import { authCheck } from "./auth-check";
 import { prisma } from "@/lib/prisma";
 import { Prisma, Product } from "@prisma/client";
 
@@ -7,7 +6,6 @@ export const createProduct = async (
   options: Prisma.ProductCreateArgs,
 ): Promise<{ success?: boolean; error?: string }> => {
   try {
-    authCheck();
     await prisma.product.create({
       ...options,
     });
@@ -23,7 +21,6 @@ export const findProducts = cache(
     options?: Prisma.ProductFindManyArgs,
   ): Promise<{ products: Product[]; error?: string }> => {
     try {
-      authCheck();
       const foundProducts = await prisma.product.findMany({ ...options });
       return { products: foundProducts };
     } catch (error) {
@@ -38,7 +35,6 @@ export const findUniqueProduct = cache(
     options: Prisma.ProductFindUniqueArgs,
   ): Promise<{ product?: Product; error?: string }> => {
     try {
-      authCheck();
       const foundProduct = await prisma.product.findUnique({
         ...options,
       });
@@ -55,7 +51,6 @@ export const updateProduct = async (
   options: Prisma.ProductUpdateArgs,
 ): Promise<{ success?: boolean; error?: string }> => {
   try {
-    authCheck();
     const updatedProduct = await prisma.product.update({
       ...options,
     });
@@ -70,7 +65,6 @@ export const deleteProduct = async (
   options: Prisma.ProductDeleteArgs,
 ): Promise<{ success?: boolean; error?: string }> => {
   try {
-    authCheck();
     const deletedProduct = await prisma.product.delete({
       ...options,
     });
@@ -81,3 +75,9 @@ export const deleteProduct = async (
     return { error: "Failed to delete product" };
   }
 };
+
+export async function deleteProductByStripeProductId(
+  stripeProductId: string,
+): Promise<void> {
+  await prisma.product.delete({ where: { stripeProductId } });
+}

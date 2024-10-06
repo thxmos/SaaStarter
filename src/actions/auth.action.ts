@@ -1,73 +1,28 @@
 "use server";
 
-import { SignUpSchema } from "./sign-up-form";
+import { SignUpSchema } from "../app/auth/_components/sign-up-form";
 import { prisma } from "@/lib/prisma";
 import { Argon2id } from "oslo/password";
 import { lucia } from "@/lib/lucia";
 import { cookies } from "next/headers";
-import { SignInSchema } from "./sign-in-form";
+import { SignInSchema } from "../app/auth/_components/sign-in-form";
 import { redirect } from "next/navigation";
 import { generateCodeVerifier, generateState } from "arctic";
 import { googleOAuthClient } from "@/lib/googleOauth";
-import { createVerificationToken } from "@/utils/createVerificationToken";
-import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
-import { createPasswordResetToken, sendPasswordResetEmail } from "./utils";
+
 import { createStripeCustomer } from "@/data-access/stripe.customers";
 import { createUser, getUserByEmail, updateUserById } from "@/data-access/user";
-
-export const sendResetEmail = async (email: string) => {
-  try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return { error: "User not found", status: 404 };
-    }
-
-    const token = await createPasswordResetToken(user.id);
-
-    if (!token) {
-      return { error: "Couldn't create token", status: 500 };
-    }
-
-    const res = await sendPasswordResetEmail(
-      user.email,
-      token,
-      user.name ?? "",
-    );
-
-    if (res.status !== 200)
-      return { error: "Couldn't send email", status: 500 };
-
-    return { success: true };
-  } catch (error) {
-    return { error: "Something went wrong", status: 500 };
-  }
-};
-
-export const sendVerifyEmail = async (email: string) => {
-  const user = await getUserByEmail(email);
-
-  if (!user) {
-    return { error: "User not found", status: 404 };
-  }
-
-  const token = await createVerificationToken(user.id);
-  const res = await sendVerificationEmail(user.email, token, user.name ?? "");
-  if (res.status !== 200) return { error: "Couldn't send email", status: 500 };
-
-  return res;
-};
+import { sendVerifyEmail } from "./email.actions";
+import { hash } from "@/utils/crypto.utils";
+import { getPasswordResetTokenByToken } from "@/data-access/password-reset-token";
 
 export const signUp = async (values: SignUpSchema) => {
   const { email, name, password } = values;
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        email: email,
-      },
-    });
+    const existingUser = await getUserByEmail(email);
     if (existingUser) return { error: "User already exists", success: false };
 
-    const hashedPassword = await new Argon2id().hash(password);
+    const hashedPassword = await hash(password);
 
     // Create user in the database
     const user = await createUser({
@@ -88,11 +43,7 @@ export const signUp = async (values: SignUpSchema) => {
     }
 
     // Send verification email
-    const res = await sendVerifyEmail(user.email);
-
-    if (res.status !== 200) {
-      return { error: "Couldn't send email", success: false };
-    }
+    await sendVerifyEmail(user.email);
 
     return {
       user: { ...user, stripeCustomerId: stripeCustomer.id },
@@ -199,13 +150,11 @@ export async function resetPassword(token: string, password: string) {
       return { message: "Invalid password", success: false };
     }
 
-    const hashedPassword = await new Argon2id().hash(password);
+    const hashedPassword = await hash(password);
 
-    const resetToken = await prisma.passwordResetToken.findUnique({
-      where: { token },
-    });
+    const resetToken = await getPasswordResetTokenByToken(token);
 
-    if (!resetToken || new Date() > resetToken.expiresAt) {
+    if (new Date() > resetToken.expiresAt) {
       return { message: "Token is invalid or has expired", success: false };
     }
 

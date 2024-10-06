@@ -24,7 +24,7 @@ function toDtoMapper(
 export async function createPasswordResetToken(
   userId: string,
 ): Promise<PasswordResetTokenDto> {
-  const { token, expiresAt } = generateTokenWithExpiration();
+  const { token, expiresAt } = generateTokenWithExpiration(0.5); // 30 minutes
 
   const createdToken = await prisma.passwordResetToken.create({
     data: { token, userId, expiresAt },

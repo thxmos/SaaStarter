@@ -1,3 +1,6 @@
+import { deletePriceByStripePriceId } from "@/data-access/price";
+import { deleteProductByStripeProductId } from "@/data-access/product";
+import { getUserByEmail } from "@/data-access/user";
 import { prisma } from "@/lib/prisma";
 import { PricingPlanInterval, PricingType } from "@prisma/client";
 import { headers } from "next/headers";
@@ -57,9 +60,7 @@ export async function POST(req: NextRequest) {
       case "product.deleted": {
         const product = data.object as Stripe.Product;
         if (!product) return;
-        const res = await prisma.product.delete({
-          where: { stripeProductId: product.id },
-        });
+        await deleteProductByStripeProductId(product.id);
         break;
       }
 
@@ -105,9 +106,7 @@ export async function POST(req: NextRequest) {
       case "price.deleted": {
         const price = data.object as Stripe.Price;
         if (!price) return;
-        const res = await prisma.price.delete({
-          where: { stripePriceId: price.id },
-        });
+        await deletePriceByStripePriceId(price.id);
         break;
       }
 
@@ -124,9 +123,7 @@ export async function POST(req: NextRequest) {
         const priceId = session?.line_items?.data[0]?.price?.id;
 
         if (customer.email) {
-          user = await prisma.user.findUnique({
-            where: { email: customer.email },
-          });
+          user = await getUserByEmail(customer.email);
 
           if (!user) {
             user = await prisma.user.create({

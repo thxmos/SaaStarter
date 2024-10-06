@@ -1,6 +1,6 @@
 import TabSwitcher from "@/components/tab-switcher";
-import SignInForm from "./sign-in-form";
-import SignUpForm from "./sign-up-form";
+import SignInForm from "./_components/sign-in-form";
+import SignUpForm from "./_components/sign-up-form";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/lucia";
 

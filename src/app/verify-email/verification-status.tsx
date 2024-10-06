@@ -25,9 +25,7 @@ export default function VerificationStatus({
     <AlertCircle className="h-12 w-12 text-red-500" aria-hidden="true" />
   );
 
-  const buttonText = isVerified
-    ? "Go to Dashboard"
-    : "Resend Verification Email";
+  const buttonText = isVerified ? "Go to Login" : "Resend Verification Email";
 
   return (
     <Card

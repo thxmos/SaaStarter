@@ -1,6 +1,10 @@
-import { prisma } from "@/lib/prisma";
+import {
+  deletePasswordResetToken,
+  getPasswordResetTokenByToken,
+} from "@/data-access/password-reset-token";
+import { updateUserById } from "@/data-access/user";
+import { hash } from "@/utils/crypto.utils";
 import { NextRequest, NextResponse } from "next/server";
-import { Argon2id } from "oslo/password";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,15 +15,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "Invalid token" }, { status: 400 });
     }
 
-    const hashedPassword = await new Argon2id().hash(password);
+    const hashedPassword = await hash(password);
 
-    const resetToken = await prisma.passwordResetToken.findUnique({
-      where: { token },
-    });
+    const resetToken = await getPasswordResetTokenByToken(token);
 
-    console.log(resetToken);
-
-    if (!resetToken || new Date() > resetToken.expiresAt) {
+    if (new Date() > resetToken.expiresAt) {
       return NextResponse.json(
         { message: "Token is invalid or has expired" },
         { status: 400 },
@@ -27,17 +27,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Update the user's password
-    const res = await prisma.user.update({
-      where: { id: resetToken.userId },
-      data: { password: hashedPassword },
+    await updateUserById(resetToken.userId, {
+      password: hashedPassword,
     });
-
-    console.log(res);
 
     // Delete the token once it's used
-    await prisma.passwordResetToken.delete({
-      where: { id: resetToken.id },
-    });
+    await deletePasswordResetToken(resetToken.id);
 
     return NextResponse.json(
       { message: "Email successfully verified!" },

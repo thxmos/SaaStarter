@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "sonner";
 import Navbar from "@/components/nav-bar/nav-bar";
-import { getUser } from "@/lib/lucia";
 import { ThemeProvider } from "@/components/theme-provider";
 import { APP_DESCRIPTION, APP_NAME } from "@/constants";
 
@@ -28,9 +27,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user } = await getUser();
-  //TODO: apply user layout
-
   const themes = [
     "dark",
     "bean",

@@ -1,4 +1,8 @@
-import { prisma } from "@/lib/prisma";
+import { updateUserById } from "@/data-access/user";
+import {
+  deleteVerificationToken,
+  getVerificationTokenByToken,
+} from "@/data-access/verification-token";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -9,11 +13,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Invalid token" }, { status: 400 });
   }
 
-  const verificationToken = await prisma.verificationToken.findUnique({
-    where: { token },
-  });
+  const verificationToken = await getVerificationTokenByToken(token);
 
-  if (!verificationToken || new Date() > verificationToken.expiresAt) {
+  if (new Date() > verificationToken.expiresAt) {
     return NextResponse.json(
       { message: "Token is invalid or has expired" },
       { status: 400 },
@@ -21,15 +23,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Update the user's email verification status
-  const res = await prisma.user.update({
-    where: { id: verificationToken.userId },
-    data: { isVerified: true },
+  const res = await updateUserById(verificationToken.userId, {
+    isVerified: true,
   });
 
   // Delete the token once it's used
-  await prisma.verificationToken.delete({
-    where: { id: verificationToken.id },
-  });
+  await deleteVerificationToken(verificationToken.id);
 
   return NextResponse.json(
     { message: "Email successfully verified!" },

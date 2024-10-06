@@ -13,9 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Mail, AlertCircle, CheckCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { sendResetEmail } from "@/app/auth/auth.action";
 import React from "react";
 import { toast } from "sonner";
+import { sendResetEmail } from "@/actions/email.actions";
 
 export default function AwaitingVerification({
   searchParams,
@@ -46,13 +46,8 @@ export default function AwaitingVerification({
     startTransition(async () => {
       try {
         const result = await sendResetEmail(email);
-        if (result.success) {
-          setResendStatus("success");
-          toast.success("Verification email sent successfully");
-        } else {
-          setResendStatus("error");
-          toast.error(result.error);
-        }
+        setResendStatus("success");
+        toast.success("Verification email sent successfully");
       } catch (error) {
         console.error("Error sending reset email:", error);
         setResendStatus("error");

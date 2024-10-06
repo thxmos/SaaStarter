@@ -1,5 +1,4 @@
 import { cache } from "react";
-import { authCheck } from "./auth-check";
 import { prisma } from "@/lib/prisma";
 import { Price, Prisma } from "@prisma/client";
 
@@ -7,7 +6,6 @@ export const createPrice = async (
   options: Prisma.PriceCreateArgs,
 ): Promise<{ success?: boolean; error?: string }> => {
   try {
-    authCheck();
     await prisma.price.create({
       ...options,
     });
@@ -23,7 +21,6 @@ export const findPrices = cache(
     options?: Prisma.PriceFindManyArgs,
   ): Promise<{ prices: Price[]; error?: string }> => {
     try {
-      authCheck();
       const foundPrices = await prisma.price.findMany({ ...options });
       return { prices: foundPrices };
     } catch (error) {
@@ -38,7 +35,6 @@ export const findUniquePrice = cache(
     options: Prisma.PriceFindUniqueArgs,
   ): Promise<{ price?: Price; error?: string }> => {
     try {
-      authCheck();
       const foundPrice = await prisma.price.findUnique({
         ...options,
       });
@@ -55,7 +51,6 @@ export const updatePrice = async (
   options: Prisma.PriceUpdateArgs,
 ): Promise<{ success?: boolean; error?: string }> => {
   try {
-    authCheck();
     const updatedPrice = await prisma.price.update({
       ...options,
     });
@@ -71,7 +66,6 @@ export const deletePrice = async (
   options: Prisma.PriceDeleteArgs,
 ): Promise<{ success?: boolean; error?: string }> => {
   try {
-    authCheck();
     const deletedPrice = await prisma.price.delete({
       ...options,
     });
@@ -82,3 +76,9 @@ export const deletePrice = async (
     return { error: "Failed to delete price" };
   }
 };
+
+export async function deletePriceByStripePriceId(
+  stripePriceId: string,
+): Promise<void> {
+  await prisma.price.delete({ where: { stripePriceId } });
+}

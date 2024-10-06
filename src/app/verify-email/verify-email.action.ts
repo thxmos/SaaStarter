@@ -1,29 +1,25 @@
 "use server";
 
+import { updateUserById } from "@/data-access/user";
+import {
+  deleteVerificationToken,
+  getVerificationTokenByToken,
+} from "@/data-access/verification-token";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
 export async function verifyEmail(token: string) {
   try {
-    const verificationToken = await prisma.verificationToken.findUnique({
-      where: { token },
-    });
+    const verificationToken = await getVerificationTokenByToken(token);
 
-    if (!verificationToken || new Date() > verificationToken.expiresAt) {
+    if (new Date() > verificationToken.expiresAt) {
       return { message: "Invalid or expired token", success: false };
     }
 
     // Update user as verified
-    await prisma.user.update({
-      where: { id: verificationToken.userId },
-      data: { isVerified: true },
-    });
+    await updateUserById(verificationToken.userId, { isVerified: true });
 
-    await prisma.verificationToken.delete({
-      where: { id: verificationToken.id },
-    });
-
-    revalidatePath("/dashboard/*");
+    // Delete the verification token
+    await deleteVerificationToken(verificationToken.id);
 
     return { message: "Email successfully verified!", success: true };
   } catch (error) {

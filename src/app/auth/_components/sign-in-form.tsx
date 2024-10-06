@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { getGoogleOauthConsentUrl, signIn } from "./auth.action";
+import { getGoogleOauthConsentUrl, signIn } from "@/actions/auth.action";
 import { BeatLoader } from "react-spinners";
 import ForgotPasswordForm from "./forgot-password-form";
 

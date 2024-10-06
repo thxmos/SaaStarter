@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { sendResetEmail } from "./auth.action";
+import { sendResetEmail } from "@/actions/email.actions";
 import { toast } from "sonner";
 import {
   Form,
@@ -37,6 +37,7 @@ const ForgotPasswordForm = ({
     setIsSubmitting(true);
     try {
       const res = await sendResetEmail(values.email);
+      console.log(res);
       if (res.success) {
         toast.success("Reset email sent");
         setIsResetPassword(false);

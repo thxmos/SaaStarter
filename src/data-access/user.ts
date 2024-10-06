@@ -61,12 +61,12 @@ export async function getUserByIdWithPassword(id: string): Promise<User> {
   return foundUser;
 }
 
-export async function getUserByEmail(email: string): Promise<UserDto> {
+export async function getUserByEmail(email: string): Promise<UserDto | null> {
   const foundUser = await prisma.user.findUnique({
     where: { email },
   });
   if (!foundUser) {
-    throw new Error("User not found with email: " + email);
+    return null;
   }
   return toDtoMapper(foundUser);
 }
