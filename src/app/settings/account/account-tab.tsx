@@ -28,8 +28,12 @@ import { getUserById, updateUserById } from "@/data-access/user";
 import { getInitials } from "@/helpers";
 import { SessionUser } from "@/lib/lucia";
 import { isValidSession } from "@/actions/session.actions";
+import { THEMES } from "@/constants";
+import { useTheme } from "next-themes";
 
 export default function AccountTab({ user }: { user: SessionUser }) {
+  const { theme, setTheme } = useTheme();
+
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -155,6 +159,34 @@ export default function AccountTab({ user }: { user: SessionUser }) {
             </div>
           </div>
           <input type="hidden" name="id" value={user?.id} />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Preferences</CardTitle>
+          <CardDescription>
+            Customize your experience by updating theme.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Theme</Label>
+            <div className="flex flex-wrap gap-2">
+              {THEMES.map((t) => (
+                <button
+                  key={t.name}
+                  type="button"
+                  className={`w-8 h-8 rounded-md border-2 ${
+                    t.name === theme ? "border-primary" : "border-transparent"
+                  }`}
+                  style={{ backgroundColor: t.color }}
+                  onClick={() => setTheme(t.name)}
+                  aria-label={`Select ${t.name} theme`}
+                />
+              ))}
+            </div>
+          </div>
         </CardContent>
       </Card>
       {/* todo: make pending state */}
