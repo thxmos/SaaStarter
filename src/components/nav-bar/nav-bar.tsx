@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Cpu } from "lucide-react";
 import { APP_NAME } from "@/constants";
 import LoginButton from "../login-button";
-import DropdownMenu from "../dropdown-menu";
+import DropdownMenu from "./dropdown-menu";
 import { getUser } from "@/lib/lucia";
 
 const Navbar = async () => {
