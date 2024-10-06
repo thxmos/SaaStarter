@@ -35,20 +35,9 @@ const ForgotPasswordForm = ({
 
   const onSubmit = async (values: ResetPasswordSchema) => {
     setIsSubmitting(true);
-    try {
-      const res = await sendResetEmail(values.email);
-      console.log(res);
-      if (res.success) {
-        toast.success("Reset email sent");
-        setIsResetPassword(false);
-      } else {
-        toast.error(res.error || "Failed to send reset email");
-      }
-    } catch (error) {
-      toast.error("An unexpected error occurred");
-    } finally {
-      setIsSubmitting(false);
-    }
+    const res = await sendResetEmail(values.email);
+    toast.success("Reset email sent if the email is valid");
+    setIsSubmitting(false);
   };
 
   return (

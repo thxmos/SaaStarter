@@ -42,6 +42,23 @@ export async function getPasswordResetTokenByToken(
   return toDtoMapper(foundToken);
 }
 
+export async function getPasswordResetTokenByUserId(
+  userId: string,
+): Promise<PasswordResetTokenDto | null> {
+  const foundToken = await prisma.passwordResetToken.findFirst({
+    where: { userId },
+  });
+  if (!foundToken) return null;
+  return toDtoMapper(foundToken);
+}
+
+export async function refreshPasswordResetToken(id: string): Promise<void> {
+  await prisma.passwordResetToken.update({
+    where: { id },
+    data: { expiresAt: generateTokenWithExpiration(0.5).expiresAt }, // 30 minutes
+  });
+}
+
 export async function deletePasswordResetToken(id: string): Promise<void> {
   await prisma.passwordResetToken.delete({ where: { id } });
 }
