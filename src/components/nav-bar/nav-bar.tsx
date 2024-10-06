@@ -24,7 +24,7 @@ const Navbar = async () => {
 
   return (
     <header
-      className="px-4 lg:px-6 h-16 flex items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      className="px-4 lg:px-6 min-h-16 flex items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       role="banner"
     >
       <Link

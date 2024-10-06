@@ -16,6 +16,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODOS:
 
+- validate dtos in data access layer
+- cron job for cleaning up expired sessions
 - database transaction support
 - UI Main layout component (prevent page scrolling when unecessary)
 - AUTH Location Verification

@@ -16,6 +16,10 @@ import { sendVerifyEmail } from "./email.actions";
 import { hash } from "@/utils/crypto.utils";
 import { getPasswordResetTokenByToken } from "@/data-access/password-reset-token";
 import { deleteSession } from "@/data-access/sessions";
+import {
+  createSessionCookie,
+  deleteSessionCookie,
+} from "@/utils/cookies.utils";
 
 export const signUp = async (values: SignUpSchema) => {
   const { email, name, password } = values;
@@ -78,12 +82,7 @@ export const signIn = async (values: SignInSchema) => {
     }
 
     const session = await lucia.createSession(user.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
+    createSessionCookie(session.id);
     return { success: true };
   } catch (error) {
     return { error: "Something went wrong", success: false };
@@ -92,16 +91,12 @@ export const signIn = async (values: SignInSchema) => {
 
 export const logout = async () => {
   const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
-  if (!sessionId) return redirect("/auth");
-  await deleteSession(sessionId);
+  if (!sessionId) redirect("/auth");
 
-  const sessionCookie = lucia.createBlankSessionCookie();
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes,
-  );
-  return redirect("/");
+  await deleteSession(sessionId);
+  deleteSessionCookie();
+
+  redirect("/");
 };
 
 export const getGoogleOauthConsentUrl = async () => {
