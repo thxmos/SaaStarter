@@ -1,4 +1,4 @@
-import Footer from "@/components/footer";
+import Footer from "@/components/landing-page/footer";
 import FeaturesSection from "@/components/landing-page/features-section";
 import HeroSection from "@/components/landing-page/hero-section";
 import PricingSection from "@/components/landing-page/pricing-section";
