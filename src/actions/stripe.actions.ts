@@ -3,6 +3,7 @@
 import { findUniqueUser } from "@/data-access/user";
 import { getUser, lucia } from "@/lib/lucia";
 import { Price } from "@prisma/client";
+import { redirect } from "next/navigation";
 import Stripe from "stripe";
 
 export interface Subscription {
@@ -48,21 +49,20 @@ export async function getPrices(active: boolean = true) {
 export const createCheckoutSession = async (
   price: Price,
   quanity: number,
-): Promise<{ success: boolean; sessionId?: string }> => {
+): Promise<{ success: boolean; sessionId?: string; message?: string }> => {
   try {
     const { user: luciaUser } = await getUser();
 
     if (!luciaUser) {
-      console.error("Session user not found.");
       return { success: false };
     }
-    const { user, error } = await findUniqueUser({
+
+    const { user } = await findUniqueUser({
       where: { id: luciaUser.id },
       select: { stripeCustomerId: true },
     });
 
     if (!user || !user.stripeCustomerId) {
-      console.error(error);
       return {
         success: false,
       };
@@ -91,7 +91,6 @@ export const createCheckoutSession = async (
 
     return { success: true, sessionId: session.id };
   } catch (error) {
-    console.error("Error creating checkout session:", error);
-    return { success: false };
+    return { success: false, message: "Failed to create checkout session." };
   }
 };

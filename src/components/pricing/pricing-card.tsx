@@ -17,6 +17,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { toast } from "sonner";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
+import { useRouter } from "next/navigation";
 
 interface Props {
   price: Price;
@@ -31,13 +32,22 @@ const PricingCard: React.FC<Props> = ({
   features,
   highlighted,
 }) => {
+  const router = useRouter();
   const [isBusy, setIsBusy] = useState(false);
 
   const handleCheckout = async () => {
     setIsBusy(true);
-    const { success, sessionId } = await createCheckoutSession(price, 1);
+    const { success, sessionId, message } = await createCheckoutSession(
+      price,
+      1,
+    );
     if (!success || !sessionId) {
-      toast.error("Failed to create checkout session, try again.");
+      if (message) {
+        toast.error(message);
+      } else {
+        router.push("/auth");
+      }
+
       return;
     }
     const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
@@ -92,7 +102,7 @@ const PricingCard: React.FC<Props> = ({
           aria-label={`Subscribe to ${product.name} plan`}
           disabled={isBusy}
         >
-          {isBusy ? <BeatLoader size={10} /> : "Subscribe"}
+          {isBusy ? <BeatLoader size={10} /> : "Choose Plan"}
         </Button>
       </CardFooter>
     </Card>
