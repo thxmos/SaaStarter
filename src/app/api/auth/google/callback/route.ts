@@ -1,8 +1,11 @@
+import { createStripeCustomer } from "@/data-access/stripe.customers";
+import { getUserByEmail, updateUserById } from "@/data-access/user";
 import { googleOAuthClient } from "@/lib/googleOauth";
 import { lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
+import { createSessionCookie } from "@/utils/cookies.utils";
+import { OAuthProvider } from "@prisma/client";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -51,49 +54,38 @@ export async function GET(req: NextRequest, res: Response) {
 
     let userId = "";
 
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        email: googleData.email,
-      },
-    });
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    const existingUser = await getUserByEmail(googleData.email);
 
     if (existingUser) {
       userId = existingUser.id;
-    } else {
+    }
+
+    if (!existingUser) {
       const user = await prisma.user.create({
         data: {
           email: googleData.email.toLowerCase(),
           name: googleData.name,
           avatar: googleData.picture,
-          isVerified: false,
+          isVerified: true,
+          oAuthProvider: OAuthProvider.GOOGLE,
         },
       });
       userId = user.id;
 
-      const stripeCustomer = await stripe.customers.create({
-        email: googleData.email.toLowerCase(),
-        name: googleData.name,
-      });
+      const stripeCustomer = await createStripeCustomer(
+        googleData.email.toLocaleLowerCase(),
+        googleData.name,
+      );
 
       if (stripeCustomer.id !== undefined) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { stripeCustomerId: stripeCustomer.id },
-        });
+        await updateUserById(user.id, { stripeCustomerId: stripeCustomer.id });
       } else {
         console.error("Failed to create Stripe customer for user", user);
       }
     }
 
     const session = await lucia.createSession(userId, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
+    createSessionCookie(session.id);
   } catch (error: any) {
     console.error("api/auth/google/callback: error", error.message);
     return new Response("Internal server error", { status: 500 });
