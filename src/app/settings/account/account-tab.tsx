@@ -27,7 +27,7 @@ import { uploadAvatar } from "./account.actions";
 import { getUserById, updateUserById } from "@/data-access/user";
 import { getInitials } from "@/helpers";
 import { SessionUser } from "@/lib/lucia";
-import { isValidSession } from "@/actions/lucia.actions";
+import { isValidSession } from "@/actions/session.actions";
 
 export default function AccountTab({ user }: { user: SessionUser }) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);

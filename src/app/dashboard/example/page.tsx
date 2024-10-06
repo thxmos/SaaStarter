@@ -1,4 +1,4 @@
-import { getUser } from "@/lib/lucia";
+import { getUser } from "@/actions/session.actions";
 import Test from "./test";
 import ProtectedLayout from "@/components/protected-layout";
 

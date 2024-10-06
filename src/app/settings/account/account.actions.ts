@@ -1,9 +1,8 @@
 "use server";
 
-import { isValidSession } from "@/actions/lucia.actions";
+import { getUser, isValidSession } from "@/actions/session.actions";
 import { uploadBlob } from "@/actions/blob.actions";
 import { updateUserAvatar } from "@/actions/user.actions";
-import { getUser } from "@/lib/lucia";
 
 // todo: do we really need this?
 export async function getUserData() {

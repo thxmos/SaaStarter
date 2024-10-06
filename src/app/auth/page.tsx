@@ -2,7 +2,7 @@ import TabSwitcher from "./_components/tab-switcher";
 import SignInForm from "./_components/sign-in-form";
 import SignUpForm from "./_components/sign-up-form";
 import { redirect } from "next/navigation";
-import { getUser } from "@/lib/lucia";
+import { getUser } from "@/actions/session.actions";
 
 const AuthPage = async () => {
   const { user } = await getUser();

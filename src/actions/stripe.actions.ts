@@ -3,9 +3,8 @@
 import { createStripeCheckoutSession } from "@/data-access/stripe.checkout.sessions";
 import { getStripeCustomer } from "@/data-access/stripe.customers";
 import { getUserById } from "@/data-access/user";
-import { getUser } from "@/lib/lucia";
 import { Price } from "@prisma/client";
-import Stripe from "stripe";
+import { getUser } from "./session.actions";
 
 export type Subscription = {
   id: string;

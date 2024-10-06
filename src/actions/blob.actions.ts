@@ -1,7 +1,7 @@
 "use server";
 
-import { getUser } from "@/lib/lucia";
 import { put } from "@vercel/blob";
+import { getUser } from "./session.actions";
 
 export const uploadBlob = async (data: FormData) => {
   const { user } = await getUser();

@@ -1,4 +1,4 @@
-import { getUser } from "@/lib/lucia";
+import { getUser } from "@/actions/session.actions";
 import BillingTab from "./billing-tab";
 
 export default async function BillingPage() {

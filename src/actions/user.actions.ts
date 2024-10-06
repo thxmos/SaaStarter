@@ -1,10 +1,9 @@
 "use server";
 
-import { getUser, lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
 import { del } from "@vercel/blob";
 import { getUserById, updateUserById } from "@/data-access/user";
+import { getUser } from "./session.actions";
 
 export const updateUserAvatar = async (url: string) => {
   const { user } = await getUser();

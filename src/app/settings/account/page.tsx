@@ -1,4 +1,4 @@
-import { getUser } from "@/lib/lucia";
+import { getUser } from "@/actions/session.actions";
 import AccountTab from "./account-tab";
 
 export default async function AccountSettingsPage() {

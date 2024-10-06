@@ -1,6 +1,6 @@
 import React from "react";
-import { getUser } from "@/lib/lucia";
 import { redirect } from "next/navigation";
+import { getUser } from "@/actions/session.actions";
 
 interface Props {
   children: React.ReactNode;
