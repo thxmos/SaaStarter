@@ -5,7 +5,7 @@ import { put } from "@vercel/blob";
 
 export const uploadBlob = async (data: FormData) => {
   const { user } = await getUser();
-  const file: File | null = data.get("file") as unknown as File;
+  const file: File | null = data.get("file") as File;
   const path: string = data.get("path") as string;
 
   if (!file || !path) {

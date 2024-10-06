@@ -4,25 +4,21 @@ import { getUser, lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { del } from "@vercel/blob";
+import { getUserById, updateUserById } from "@/data-access/user";
 
 export const updateUserAvatar = async (url: string) => {
   const { user } = await getUser();
   if (!user) return;
 
   try {
-    const blobUrl = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { avatar: true },
-    });
+    const blobUrl = await getUserById(user.id);
 
     if (blobUrl?.avatar?.includes("public.blob.vercel-storage.com")) {
       await del(blobUrl.avatar);
     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: { avatar: url },
-    });
+    await updateUserById(user.id, { avatar: url });
+
     return {
       success: true,
     };

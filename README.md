@@ -16,12 +16,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODOS:
 
-- REFACTOR UseSession / getUserSession
-- REFACTOR Look into best way to do forms
-  - Password Reset page form
-- UI Awaiting page fix emails
 - UI Main layout component (prevent page scrolling when unecessary)
-- UI refresh theme on user update (look into theme provider or revalidatePath)
 - AUTH isVerified access restriction (either edit generic layout or make a verified-layout protection layer)
 - AUTH Location Verification
   - verify different devices / location from the first signed up device
