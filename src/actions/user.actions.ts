@@ -1,9 +1,10 @@
 "use server";
 
 import { getUserById, updateUserById } from "@/data-access/user";
-import { getUser } from "@/lib/lucia";
+import { getUser, lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
 import { del } from "@vercel/blob";
+import { cookies } from "next/headers";
 
 export const updateUserAvatar = async (url: string) => {
   const { user } = await getUser();
@@ -18,12 +19,6 @@ export const updateUserAvatar = async (url: string) => {
 
     await updateUserById(user.id, { avatar: url });
 
-    // if (!updatedUser.success) {
-    //   console.error(updatedUser.error);
-    //   return {
-    //     success: false,
-    //   };
-    // }
     return {
       success: true,
     };

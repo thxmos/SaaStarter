@@ -12,6 +12,6 @@ type createSessionDto = {
 //   return prisma.session.create({ data: { userId, expiresAt } });
 // };
 
-// export const deleteSession = async (id: string): Promise<Session> => {
-//   return prisma.session.delete({ where: { id } });
-// };
+export const deleteSession = async (id: string): Promise<Session> => {
+  return prisma.session.delete({ where: { id } });
+};
