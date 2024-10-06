@@ -42,3 +42,28 @@ export async function passwordReset(formData: FormData, userId: string) {
     };
   }
 }
+
+export async function setPasswordOAuth(formData: FormData, userId: string) {
+  const newPassword = formData.get("newPassword") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
+
+  if (!newPassword || !confirmPassword) {
+    throw new Error("All fields are required");
+  }
+  if (newPassword !== confirmPassword) {
+    throw new Error("New password and confirmation do not match");
+  }
+
+  try {
+    const hashedPassword = await hash(newPassword);
+
+    await updateUserById(userId, { password: hashedPassword });
+
+    return { success: true, message: "Password set successfully" };
+  } catch (error) {
+    return {
+      success: false,
+      message: error,
+    };
+  }
+}

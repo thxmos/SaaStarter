@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { User } from "@prisma/client";
+import { OAuthProvider, User } from "@prisma/client";
 
 export type CreateUserDto = {
   email: string;
@@ -17,6 +17,7 @@ export type UserDto = {
   avatar: string | null;
   isVerified: boolean;
   stripeCustomerId: string | null;
+  oAuthProvider: OAuthProvider | null;
 };
 
 function toDtoMapper(user: User): UserDto {
@@ -27,6 +28,7 @@ function toDtoMapper(user: User): UserDto {
     avatar: user.avatar,
     isVerified: user.isVerified,
     stripeCustomerId: user.stripeCustomerId,
+    oAuthProvider: user.oAuthProvider,
   };
 }
 
