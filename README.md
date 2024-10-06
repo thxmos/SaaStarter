@@ -16,13 +16,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## TODOS:
 
+- database transaction support
 - UI Main layout component (prevent page scrolling when unecessary)
-- AUTH isVerified access restriction (either edit generic layout or make a verified-layout protection layer)
 - AUTH Location Verification
   - verify different devices / location from the first signed up device
   - 2fa enablement
-- FEATURE Billing Page
-- STRIPE product default prices
+- Billing Page Invoice history
 - DOCUMENTATION
   - where to get env variables
   - commands

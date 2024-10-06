@@ -6,7 +6,7 @@ import {
   getVerificationTokenByToken,
 } from "@/data-access/verification-token";
 
-export async function verifyEmail(token: string) {
+export async function verifyEmailToken(token: string) {
   try {
     const verificationToken = await getVerificationTokenByToken(token);
 

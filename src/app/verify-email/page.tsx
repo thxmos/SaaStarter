@@ -1,11 +1,9 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import VerificationStatus from "./verification-status";
-import { verifyEmail } from "./verify-email.action";
-import { getUser } from "@/lib/lucia";
-import { getUserById } from "@/data-access/user";
+import { verifyEmailToken } from "./verify-email.action";
 
-export default async function VerifyEmail({
+export default async function VerifyEmailPage({
   searchParams,
 }: {
   searchParams: { token?: string };
@@ -21,7 +19,7 @@ export default async function VerifyEmail({
     redirect("/auth");
   }
 
-  const res = await verifyEmail(token);
+  const res = await verifyEmailToken(token);
 
   if (res.success) {
     isVerified = true;
