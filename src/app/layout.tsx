@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "sonner";
-import Navbar from "@/components/nav-bar";
+import Navbar from "@/components/nav-bar/nav-bar";
 import { getUser } from "@/lib/lucia";
 import { ThemeProvider } from "@/components/theme-provider";
 import { APP_DESCRIPTION, APP_NAME } from "@/constants";
@@ -31,6 +31,19 @@ export default async function RootLayout({
   const { user } = await getUser();
   //TODO: apply user layout
 
+  const themes = [
+    "dark",
+    "bean",
+    "blue",
+    "green",
+    "purple",
+    "purple-dark",
+    "orange",
+    "pink",
+    "teal",
+    "teal-light",
+  ];
+
   return (
     <html lang="en">
       <body
@@ -38,8 +51,8 @@ export default async function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme={user?.theme || "bean"}
-          enableSystem
+          defaultTheme="purple"
+          themes={themes}
           disableTransitionOnChange
         >
           <Navbar />
