@@ -1,9 +1,8 @@
 "use server";
 
-import { findUniqueUser } from "@/data-access/user";
-import { getUser, lucia } from "@/lib/lucia";
+import { getUserById } from "@/data-access/user";
+import { getUser } from "@/lib/lucia";
 import { Price } from "@prisma/client";
-import { redirect } from "next/navigation";
 import Stripe from "stripe";
 
 export interface Subscription {
@@ -57,10 +56,7 @@ export const createCheckoutSession = async (
       return { success: false };
     }
 
-    const { user } = await findUniqueUser({
-      where: { id: luciaUser.id },
-      select: { stripeCustomerId: true },
-    });
+    const user = await getUserById(luciaUser.id);
 
     if (!user || !user.stripeCustomerId) {
       return {

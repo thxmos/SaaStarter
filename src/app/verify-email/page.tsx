@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import VerificationStatus from "./verification-status";
 import { verifyEmail } from "./verify-email.action";
 import { getUser } from "@/lib/lucia";
-import { findUniqueUser } from "@/data-access/user";
+import { getUserById } from "@/data-access/user";
 
 export default async function VerifyEmail({
   searchParams,
@@ -13,16 +13,7 @@ export default async function VerifyEmail({
   let message =
     "We're sorry, but something went wrong during the email verification process. The verification link may have expired or is invalid.";
 
-  const { user: luciaUser } = await getUser();
-  const { user } = await findUniqueUser({
-    where: { id: luciaUser?.id },
-    select: { isVerified: true },
-  });
-  let isVerified = user?.isVerified ?? false;
-
-  if (isVerified) {
-    redirect("/dashboard");
-  }
+  let isVerified = false;
 
   const token = searchParams.token;
 

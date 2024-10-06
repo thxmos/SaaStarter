@@ -2,8 +2,6 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { lucia } from "@/lib/lucia";
-import { cookies } from "next/headers";
 
 export async function verifyEmail(token: string) {
   try {
@@ -14,23 +12,6 @@ export async function verifyEmail(token: string) {
     if (!verificationToken || new Date() > verificationToken.expiresAt) {
       return { message: "Invalid or expired token", success: false };
     }
-
-    // Ensure user is not already verified and sign them in
-    const user = await prisma.user.findUnique({
-      where: { id: verificationToken.userId },
-    });
-
-    if (!user || user.isVerified) {
-      return { error: "Already verified", success: false };
-    }
-
-    const session = await lucia.createSession(user.id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes,
-    );
 
     // Update user as verified
     await prisma.user.update({

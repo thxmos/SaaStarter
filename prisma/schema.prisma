@@ -14,7 +14,6 @@ model User {
 
   password   String?
   avatar     String?
-  theme      String?
   isVerified Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -37,7 +36,6 @@ model VerificationToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String
-  createdAt DateTime @default(now())
   expiresAt DateTime
 }
 
@@ -45,7 +43,6 @@ model PasswordResetToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String
-  createdAt DateTime @default(now())
   expiresAt DateTime
 }
 

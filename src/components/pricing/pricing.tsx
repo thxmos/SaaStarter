@@ -1,8 +1,8 @@
 import { getUserSubscriptions } from "@/actions/user.actions";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { findPrices } from "@/data-access/stripe.prices";
-import { findProducts } from "@/data-access/stripe.products";
+import { findPrices } from "@/data-access/price";
+import { findProducts } from "@/data-access/product";
 import { Price, Product } from "@prisma/client";
 import PricingCard from "@/components/pricing/pricing-card";
 

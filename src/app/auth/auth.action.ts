@@ -12,7 +12,8 @@ import { googleOAuthClient } from "@/lib/googleOauth";
 import { createVerificationToken } from "@/utils/createVerificationToken";
 import { sendVerificationEmail } from "@/utils/sendVerificationEmail";
 import { createPasswordResetToken, sendPasswordResetEmail } from "./utils";
-import { Stripe } from "stripe";
+import { createStripeCustomer } from "@/data-access/stripe.customers";
+import { createUser, getUserByEmail, updateUserById } from "@/data-access/user";
 
 export const sendResetEmail = async (email: string) => {
   try {
@@ -43,11 +44,7 @@ export const sendResetEmail = async (email: string) => {
 };
 
 export const sendVerifyEmail = async (email: string) => {
-  if (!email) {
-    return { error: "Email is required", status: 400 };
-  }
-
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await getUserByEmail(email);
 
   if (!user) {
     return { error: "User not found", status: 404 };
@@ -73,31 +70,19 @@ export const signUp = async (values: SignUpSchema) => {
     const hashedPassword = await new Argon2id().hash(password);
 
     // Create user in the database
-    const user = await prisma.user.create({
-      data: {
-        email: values.email.toLowerCase(),
-        name: values.name,
-        password: hashedPassword,
-      },
-    });
-
-    // Create Stripe customer and update user with Stripe customer ID
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-    if (!user.name || !user.email) {
-      console.error("Couldn't create Stripe customer: missing user data", user);
-    }
-
-    const stripeCustomer = await stripe.customers.create({
+    const user = await createUser({
       email: email.toLowerCase(),
-      name: name,
+      name,
+      password: hashedPassword,
     });
+
+    const stripeCustomer = await createStripeCustomer(
+      user.email,
+      user.name ?? "",
+    );
 
     if (stripeCustomer.id !== undefined) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { stripeCustomerId: stripeCustomer.id },
-      });
+      await updateUserById(user.id, { stripeCustomerId: stripeCustomer.id });
     } else {
       console.error("Failed to create Stripe customer for user", user);
     }

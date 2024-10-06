@@ -1,85 +1,100 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { cache } from "react";
-import { authCheck } from "./auth-check";
-import { Prisma, User } from "@prisma/client";
+import { User } from "@prisma/client";
 
-export const createUser = async (
-  options: Prisma.UserCreateArgs,
-): Promise<{ success?: boolean; error?: string }> => {
-  try {
-    authCheck();
-    await prisma.user.create({
-      ...options,
-    });
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to create user", error);
-    return { error: "Failed to create user" };
-  }
+export type CreateUserDto = {
+  email: string;
+  password: string;
+  name?: string;
+  avatar?: string;
 };
 
-export const findUsers = cache(
-  async (
-    options?: Prisma.UserFindManyArgs,
-  ): Promise<{ users: User[]; error?: string }> => {
-    try {
-      authCheck();
-      const foundUsers = await prisma.user.findMany({ ...options });
-      return { users: foundUsers };
-    } catch (error) {
-      console.error(`Failed to find users`, error);
-      return { users: [], error: "Failed to fetch users" };
-    }
-  },
-);
-
-export const findUniqueUser = cache(
-  async (
-    options: Prisma.UserFindUniqueArgs,
-  ): Promise<{ user?: User; error?: string }> => {
-    try {
-      authCheck();
-      const foundUser = await prisma.user.findUnique({
-        ...options,
-      });
-      if (!foundUser) return { error: "User not found" };
-      return {
-        user: foundUser,
-      };
-    } catch (error) {
-      console.error("Failed to find user with options", options, error);
-      return { error: "Failed to fetch user" };
-    }
-  },
-);
-
-export const updateUser = async (
-  options: Prisma.UserUpdateArgs,
-): Promise<{ success?: boolean; error?: string }> => {
-  try {
-    authCheck();
-    await prisma.user.update({
-      ...options,
-    });
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to update user", error);
-    return { error: "Failed to update user" };
-  }
+export type UserDto = {
+  id: string;
+  email: string;
+  name: string | null;
+  avatar: string | null;
+  isVerified: boolean;
+  stripeCustomerId: string | null;
 };
 
-export const deleteUser = async (
-  options: Prisma.UserDeleteArgs,
-): Promise<{ success?: boolean; error?: string }> => {
-  try {
-    authCheck();
-    const deletedUser = await prisma.user.delete({ ...options });
-    if (!deletedUser) return { error: "User not found" };
-    return { success: true };
-  } catch (error) {
-    console.error("Failed to delete user", error);
-    return { error: "Failed to delete user" };
+function toDtoMapper(user: User): UserDto {
+  return {
+    id: user.id,
+    email: user.email.toLowerCase(),
+    name: user.name,
+    avatar: user.avatar,
+    isVerified: user.isVerified,
+    stripeCustomerId: user.stripeCustomerId,
+  };
+}
+
+export async function createUser(data: CreateUserDto): Promise<UserDto> {
+  const createdUser = await prisma.user.create({ data });
+  return toDtoMapper(createdUser);
+}
+
+export async function getUsers(): Promise<UserDto[]> {
+  //use cache or no?
+  const users = await prisma.user.findMany();
+  return users.map(toDtoMapper);
+}
+
+export async function getUserById(id: string): Promise<UserDto> {
+  const foundUser = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!foundUser) {
+    throw new Error("User not found with id: " + id);
   }
-};
+  return toDtoMapper(foundUser);
+}
+
+export async function getUserByIdWithPassword(id: string): Promise<User> {
+  const foundUser = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!foundUser) {
+    throw new Error("User not found with id: " + id);
+  }
+  return foundUser;
+}
+
+export async function getUserByEmail(email: string): Promise<UserDto> {
+  const foundUser = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!foundUser) {
+    throw new Error("User not found with email: " + email);
+  }
+  return toDtoMapper(foundUser);
+}
+
+export async function getUserByEmailWithPassword(email: string): Promise<User> {
+  const foundUser = await prisma.user.findUnique({
+    where: { email },
+  });
+  if (!foundUser) {
+    throw new Error("User not found with email: " + email);
+  }
+  return foundUser;
+}
+
+export async function updateUserById(
+  id: string,
+  data: Partial<User>,
+): Promise<void> {
+  await prisma.user.update({ where: { id }, data });
+}
+
+export async function updateUserByEmail(
+  email: string,
+  data: Partial<User>,
+): Promise<void> {
+  await prisma.user.update({ where: { email }, data });
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  await prisma.user.delete({ where: { id } });
+}

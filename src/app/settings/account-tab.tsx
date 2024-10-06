@@ -28,9 +28,9 @@ import FileUpload, { FileType } from "@/components/file-upload";
 import { uploadBlob } from "@/actions/blob.actions";
 import { isValidSession, updateUserAvatar } from "@/actions/user.actions";
 import { getInitials } from "@/helpers";
-import { findUniqueUser, updateUser } from "@/data-access/user";
 import { getUserAction } from "@/actions/lucia.actions";
-import { User } from "@prisma/client";
+import { getUserById, updateUserById, UserDto } from "@/data-access/user";
+import { useTheme } from "next-themes";
 
 const themes = [
   { name: "light", color: "#ffffff" },
@@ -44,15 +44,14 @@ const themes = [
 ];
 
 export default function AccountTab() {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<UserDto>();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const fetch = async () => {
-      const { user: sessionUser, session } = await getUserAction();
+      const { user: sessionUser } = await getUserAction();
       if (sessionUser) {
-        const { user } = await findUniqueUser({
-          where: { id: sessionUser.id },
-        });
+        const user = await getUserById(sessionUser.id);
         setUser(user);
       }
     };
@@ -64,9 +63,10 @@ export default function AccountTab() {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [selectedTheme, setSelectedTheme] = useState(
-    user?.theme || themes[0].name,
-  );
+  // todo: next theme hook to get theme from localstorage
+  // const [selectedTheme, setSelectedTheme] = useState(
+  //   user?.theme || themes[0].name,
+  // );
 
   const handleAvatarUpload = async () => {
     const isSessionValid = await isValidSession();
@@ -98,7 +98,8 @@ export default function AccountTab() {
       setIsUploadingAvatar(false);
       router.refresh();
       setIsModalOpen(false);
-      await updateUser({ where: { id: user?.id }, data: { avatar: blob.url } });
+      await updateUserById(user?.id!, { avatar: blob.url });
+
       toast.success("Avatar uploaded successfully");
     } else {
       setIsUploadingAvatar(false);
@@ -110,13 +111,11 @@ export default function AccountTab() {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    formData.append("theme", selectedTheme);
 
     startTransition(async () => {
       try {
-        await updateUser({
-          where: { id: user?.id },
-          data: { name: formData.get("name") as string, theme: selectedTheme },
+        await updateUserById(user?.id!, {
+          name: formData.get("name") as string,
         });
         toast.success("Successfully updated user");
       } catch (error) {
@@ -220,13 +219,14 @@ export default function AccountTab() {
                   <button
                     key={theme.name}
                     type="button"
-                    className={`w-8 h-8 rounded-md border-2 ${
-                      selectedTheme === theme.name
-                        ? "border-primary"
-                        : "border-transparent"
-                    }`}
+                    className={`w-8 h-8 rounded-md border-2 `}
+                    // ${
+                    //   selectedTheme === theme.name
+                    //     ? "border-primary"
+                    //     : "border-transparent"
+                    // }
                     style={{ backgroundColor: theme.color }}
-                    onClick={() => setSelectedTheme(theme.name)}
+                    onClick={() => setTheme(theme.name)}
                     aria-label={`Select ${theme.name} theme`}
                   />
                 ))}

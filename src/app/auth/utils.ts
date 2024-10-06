@@ -4,7 +4,7 @@ import { APP_NAME } from "@/constants";
 import PasswordResetEmail from "@/emails/password-reset";
 import { prisma } from "@/lib/prisma";
 import { resend } from "@/lib/resend";
-import crypto from "crypto";
+import { generateTokenWithExpiration } from "@/utils/crypto.utils";
 
 export const sendPasswordResetEmail = async (
   email: string,
@@ -15,8 +15,8 @@ export const sendPasswordResetEmail = async (
 
   const fromEmail =
     process.env.NODE_ENV === "production"
-      ? "onboarding@resend.dev"
-      : `${APP_NAME} <no-reply@${process.env.NEXT_PUBLIC_URL}>`;
+      ? `${APP_NAME} <no-reply@${process.env.NEXT_PUBLIC_URL}>`
+      : "onboarding@resend.dev";
 
   const res = await resend.emails.send({
     from: fromEmail,
@@ -30,10 +30,7 @@ export const sendPasswordResetEmail = async (
 
 export const createPasswordResetToken = async (userId: string) => {
   try {
-    const token = crypto.randomBytes(32).toString("hex");
-
-    // Set token expiration to 24 hours from now
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const { token, expiresAt } = generateTokenWithExpiration(24);
 
     const res = await prisma.passwordResetToken.create({
       data: {
@@ -42,8 +39,6 @@ export const createPasswordResetToken = async (userId: string) => {
         expiresAt,
       },
     });
-
-    console.log("Token created", res, token);
 
     return token;
   } catch (error) {

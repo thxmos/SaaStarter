@@ -12,8 +12,8 @@ export const sendVerificationEmail = async (
 
     const fromEmail =
       process.env.NODE_ENV === "production"
-        ? "onboarding@resend.dev"
-        : `${APP_NAME} <no-reply@${process.env.NEXT_PUBLIC_URL}>`;
+        ? `${APP_NAME} <no-reply@${process.env.NEXT_PUBLIC_URL}>`
+        : "onboarding@resend.dev";
 
     const res = await resend.emails.send({
       to: email,
