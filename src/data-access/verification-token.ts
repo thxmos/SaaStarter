@@ -1,5 +1,3 @@
-"use server";
-
 import { prisma } from "@/lib/prisma";
 import { generateTokenWithExpiration } from "@/utils/crypto.utils";
 import { VerificationToken } from "@prisma/client";
