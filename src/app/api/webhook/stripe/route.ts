@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (eventType) {
+      case "product.created":
       case "product.updated": {
         const product = data.object as Stripe.Product;
         if (!product) return;
