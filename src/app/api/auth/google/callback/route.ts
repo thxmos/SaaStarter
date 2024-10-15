@@ -5,11 +5,9 @@ import { lucia } from "@/lib/lucia";
 import { prisma } from "@/lib/prisma";
 import { createSessionCookie } from "@/utils/cookies.utils";
 import { OAuthProvider } from "@prisma/client";
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 
-export async function GET(req: NextRequest, res: Response) {
+export async function GET(req: NextRequest) {
   try {
     const url = req.nextUrl;
     const code = url.searchParams.get("code");
