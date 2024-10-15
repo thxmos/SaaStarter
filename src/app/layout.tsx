@@ -28,6 +28,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const themes = [
+    "light",
     "dark",
     "bean",
     "blue",
@@ -47,7 +48,7 @@ export default async function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="purple"
+          defaultTheme="light"
           themes={themes}
           disableTransitionOnChange
         >
