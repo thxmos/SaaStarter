@@ -78,10 +78,11 @@ export default function AccountTab({ user }: { user: SessionUser }) {
       const name = formData.get("name") as string;
 
       await updateUserById(userId, { name });
-      const user = await getUserById(userId);
+      await getUserById(userId);
 
       toast.success("Successfully updated user");
-    } catch {
+    } catch (error) {
+      console.error(error);
       toast.error("Could not update user");
     }
   };
