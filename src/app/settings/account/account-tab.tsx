@@ -23,8 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import FileUpload, { FileType } from "@/components/file-upload";
-import { uploadAvatar } from "./account.actions";
-import { getUserById, updateUserById } from "@/data-access/user";
+import { updateUser, uploadAvatar } from "./account.actions";
 import { getInitials } from "@/helpers";
 import { SessionUser } from "@/lib/lucia";
 import { isValidSession } from "@/actions/session.actions";
@@ -67,19 +66,11 @@ export default function AccountTab({ user }: { user: SessionUser }) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const userId = formData.get("id") as string;
+    const name = formData.get("name") as string;
 
     try {
-      const isSessionValid = await isValidSession();
-      if (!isSessionValid) {
-        throw new Error("Your session has expired. Please log in again.");
-      }
-
-      const userId = formData.get("id") as string;
-      const name = formData.get("name") as string;
-
-      await updateUserById(userId, { name });
-      await getUserById(userId);
-
+      await updateUser(userId, { name });
       toast.success("Successfully updated user");
     } catch (error) {
       console.error(error);

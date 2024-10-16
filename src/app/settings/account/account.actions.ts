@@ -3,6 +3,8 @@
 import { getUser, isValidSession } from "@/actions/session.actions";
 import { uploadBlob } from "@/actions/blob.actions";
 import { updateUserAvatar } from "@/actions/user.actions";
+import { updateUserById } from "@/data-access/user";
+import { User } from "@prisma/client";
 
 // todo: do we really need this?
 export async function getUserData() {
@@ -32,4 +34,13 @@ export async function uploadAvatar(formData: FormData) {
   } else {
     throw new Error("Failed to upload avatar");
   }
+}
+
+export async function updateUser(userId: string, data: Partial<User>) {
+  const isSessionValid = await isValidSession();
+  if (!isSessionValid) {
+    throw new Error("Your session has expired. Please log in again.");
+  }
+
+  await updateUserById(userId, data);
 }
