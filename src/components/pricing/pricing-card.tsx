@@ -35,6 +35,9 @@ const PricingCard: React.FC<Props> = ({
   const router = useRouter();
   const [isBusy, setIsBusy] = useState(false);
 
+  //TODO: make the current card say "Current Plan" and be disabled
+  //TODO: make other cards say "Update Plan"
+
   const handleCheckout = async () => {
     setIsBusy(true);
     const { success, sessionId, message } = await createCheckoutSession(
