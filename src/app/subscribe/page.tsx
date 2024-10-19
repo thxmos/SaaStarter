@@ -7,7 +7,7 @@ import SubscribedCard from "@/components/pricing/subscribed-card";
 const SubscribePage = async () => {
   const subscriptions = await getUserSubscriptions();
 
-  if (subscriptions) return <SubscribedCard />;
+  // if (subscriptions) return <SubscribedCard />;
 
   return (
     <ProtectedLayout>
