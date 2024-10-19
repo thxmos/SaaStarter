@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +12,7 @@ import {
 import { Download } from "lucide-react";
 import Link from "next/link";
 import { SessionUser } from "@/lib/lucia";
+import Stripe from "stripe";
 
 const mockBillingHistory = [
   {
@@ -27,7 +27,14 @@ const mockBillingHistory = [
   },
 ];
 
-export default function BillingTab({ user }: { user: SessionUser }) {
+export default function BillingTab({
+  user,
+  billingInfo,
+}: {
+  user: SessionUser;
+  billingInfo: Stripe.Subscription | null;
+}) {
+  console.log(billingInfo);
   return (
     <Card className="w-full">
       <CardHeader>
@@ -41,6 +48,7 @@ export default function BillingTab({ user }: { user: SessionUser }) {
           <h3 className="text-lg font-semibold mb-2" id="billing-history">
             Billing History
           </h3>
+
           <ul className="space-y-2" aria-labelledby="billing-history">
             {mockBillingHistory.map((item, index) => (
               <li key={item.date} className="flex justify-between items-center">
