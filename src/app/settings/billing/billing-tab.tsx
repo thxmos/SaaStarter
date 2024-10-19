@@ -34,7 +34,6 @@ export default function BillingTab({
   user: SessionUser;
   billingInfo: Stripe.Subscription | null;
 }) {
-  console.log(billingInfo);
   return (
     <Card className="w-full">
       <CardHeader>
