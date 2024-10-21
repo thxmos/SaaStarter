@@ -8,11 +8,5 @@ export default async function BillingPage() {
 
   const billingInfo = await getBillingInfo(user.id);
 
-  return (
-    <main className="flex-1 p-8 overflow-y-auto bg-background">
-      <div className="w-full max-w-5xl">
-        <BillingTab user={user} billingInfo={billingInfo} />
-      </div>
-    </main>
-  );
+  return <BillingTab user={user} billingInfo={billingInfo} />;
 }

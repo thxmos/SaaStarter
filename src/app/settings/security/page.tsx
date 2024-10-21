@@ -8,11 +8,5 @@ export default async function SecurityPage() {
   const { password } = await getUserByIdWithPassword(sessionUser.id);
   const hasPassword = !!password;
 
-  return (
-    <main className="flex-1 p-8 overflow-y-auto bg-background">
-      <div className="w-full max-w-5xl">
-        <SecurityTab user={user} hasPassword={hasPassword} />
-      </div>
-    </main>
-  );
+  return <SecurityTab user={user} hasPassword={hasPassword} />;
 }

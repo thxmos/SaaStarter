@@ -21,7 +21,7 @@ type Props = {
 const LayoutSidebar: React.FC<Props> = ({ tabs, title }) => {
   const pathname = usePathname();
   return (
-    <aside className="w-64 bg-card p-6 shadow-md">
+    <aside className="w-64 bg-card p-6 shadow-md h-full">
       <div className="flex items-center mb-8">
         <LayoutDashboard className="h-8 w-8 text-primary mr-2" />
         <h2 className="text-2xl font-bold text-foreground">{title}</h2>

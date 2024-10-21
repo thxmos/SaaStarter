@@ -44,7 +44,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden`}
       >
         <ThemeProvider
           attribute="class"
@@ -52,9 +52,10 @@ export default async function RootLayout({
           themes={themes}
           disableTransitionOnChange
         >
-          <div className="max-h-screen flex flex-col">
+          <div className="max-h-screen flex flex-col h-screen">
             <Navbar />
             <Toaster richColors />
+
             {children}
           </div>
         </ThemeProvider>

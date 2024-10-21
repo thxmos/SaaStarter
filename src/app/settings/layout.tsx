@@ -30,13 +30,15 @@ const SettingsLayout: React.FC<Props> = async ({ children }) => {
   ];
   return (
     <ProtectedLayout redirectUrl="/auth">
-      <div className="flex h-screen bg-background">
+      <div className="flex h-full">
         <LayoutSidebar
           tabs={tabs}
           title="Settings"
           headerIcon={<LayoutDashboard />}
         />
-        {children}
+        <main className="h-full w-full p-8 box-border overflow-y-scroll">
+          <div className="max-w-5xl gap-4 flex flex-col">{children}</div>
+        </main>
       </div>
     </ProtectedLayout>
   );

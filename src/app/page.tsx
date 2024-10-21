@@ -6,7 +6,7 @@ import SubscribeSection from "@/components/landing-page/subscribe-section";
 
 export default async function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
+    <div className="flex flex-col min-h-screen bg-background text-foreground overflow-scroll w-full">
       <main className="flex-1">
         <HeroSection />
         <FeaturesSection />

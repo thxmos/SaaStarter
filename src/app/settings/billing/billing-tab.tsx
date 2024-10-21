@@ -20,70 +20,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import Image from "next/image";
+import { mockBillingHistory } from "./mockData";
 
-const mockBillingHistory = (year: string) => [
-  {
-    date: `December 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/december-${year}.pdf`,
-  },
-  {
-    date: `November 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/november-${year}.pdf`,
-  },
-  {
-    date: `October 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/october-${year}.pdf`,
-  },
-  {
-    date: `September 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/september-${year}.pdf`,
-  },
-  {
-    date: `August 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/august-${year}.pdf`,
-  },
-  {
-    date: `July 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/july-${year}.pdf`,
-  },
-  {
-    date: `June 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/june-${year}.pdf`,
-  },
-  {
-    date: `May 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/may-${year}.pdf`,
-  },
-  {
-    date: `April 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/april-${year}.pdf`,
-  },
-  {
-    date: `March 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/march-${year}.pdf`,
-  },
-  {
-    date: `February 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/february-${year}.pdf`,
-  },
-  {
-    date: `January 1, ${year}`,
-    amount: "$29.99",
-    invoiceUrl: `/invoices/january-${year}.pdf`,
-  },
-];
+//TODO:
+// actually have invoices
+// dropdown starts from user subscription date
 
 export default function BillingTab({
   user,
@@ -100,8 +41,8 @@ export default function BillingTab({
   const unitAmount = Number(price.unitAmount) / 100; // Convert BigInt to number and divide by 100 if it's in cents
 
   return (
-    <span className="flex flex-col gap-4">
-      <Card className="w-full">
+    <>
+      <Card className="w-full ">
         <CardHeader>
           <CardTitle className="text-2xl">Subscription Details</CardTitle>
           <CardDescription>Manage your subscription plan</CardDescription>
@@ -114,16 +55,12 @@ export default function BillingTab({
             {billingInfo ? (
               <div className="flex flex-col gap-2">
                 <p>{product.description}</p>
-                {/* <Image
-                  src={product.image ?? ""}
-                  alt={`${product.name} image`}
-                  width={320}
-                  height={240}
-                  className="w-full max-w-xs h-auto object-contain"
-                /> */}
                 <h4>
                   ${unitAmount} {price.currency?.toUpperCase()}
                 </h4>
+                <span className="text-sm text-gray-500">
+                  {product.active ? "Active" : "Inactive"}
+                </span>
               </div>
             ) : (
               <h4>No active subscription</h4>
@@ -131,7 +68,7 @@ export default function BillingTab({
           </div>
         </CardContent>
         <CardFooter className="flex space-x-4">
-          <Link target="_blank" href={`/subscribe`}>
+          <Link href={`/subscribe`}>
             <Button>
               <span className="sr-only">
                 Access customer portal to manage your subscription plan
@@ -197,6 +134,6 @@ export default function BillingTab({
           </div>
         </CardContent>
       </Card>
-    </span>
+    </>
   );
 }

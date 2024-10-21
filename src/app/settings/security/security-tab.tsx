@@ -19,18 +19,16 @@ export default function SecurityTab({
   hasPassword: boolean;
 }) {
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Security Settings</CardTitle>
-          <CardDescription>Manage your account's security.</CardDescription>
-        </CardHeader>
-        {user.oAuthProvider && !hasPassword ? (
-          <PasswordResetFormOAuth user={user} />
-        ) : (
-          <PasswordResetForm user={user} />
-        )}
-      </Card>
-    </>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-2xl">Security Settings</CardTitle>
+        <CardDescription>Manage your account's security.</CardDescription>
+      </CardHeader>
+      {user.oAuthProvider && !hasPassword ? (
+        <PasswordResetFormOAuth user={user} />
+      ) : (
+        <PasswordResetForm user={user} />
+      )}
+    </Card>
   );
 }

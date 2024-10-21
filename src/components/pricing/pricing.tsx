@@ -1,9 +1,7 @@
-import { getUserSubscriptions } from "@/actions/user.actions";
 import { findPrices } from "@/data-access/price";
 import { findProducts } from "@/data-access/product";
 import { Price, Product } from "@prisma/client";
 import PricingCard from "@/components/pricing/pricing-card";
-import SubscribedCard from "./subscribed-card";
 
 const MOCK_FEATURES = [
   "Premium Big Beans",
@@ -20,8 +18,6 @@ interface Plan {
 }
 
 const Pricing = async () => {
-  const subscriptions = await getUserSubscriptions();
-
   const { prices } = await findPrices();
   const { products } = await findProducts();
 
