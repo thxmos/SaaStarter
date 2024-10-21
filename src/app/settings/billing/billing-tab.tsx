@@ -80,7 +80,7 @@ export default function BillingTab({
           </Link>
         </CardFooter>
       </Card>
-      <Card className="w-full">
+      {/* <Card className="w-full">
         <CardHeader>
           <CardTitle className="text-2xl">Billing Information</CardTitle>
           <CardDescription>
@@ -133,7 +133,7 @@ export default function BillingTab({
             </ul>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </>
   );
 }
