@@ -36,6 +36,7 @@ export default function AccountTab({ user }: { user: SessionUser }) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAvatarUpload = async () => {
     if (!avatarFile) {
@@ -65,6 +66,7 @@ export default function AccountTab({ user }: { user: SessionUser }) {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
     const formData = new FormData(event.currentTarget);
     const userId = formData.get("id") as string;
     const name = formData.get("name") as string;
@@ -75,6 +77,8 @@ export default function AccountTab({ user }: { user: SessionUser }) {
     } catch (error) {
       console.error(error);
       toast.error("Could not update user");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -182,8 +186,8 @@ export default function AccountTab({ user }: { user: SessionUser }) {
         </CardContent>
       </Card>
       {/* todo: make pending state */}
-      <Button type="submit" className="max-w-56">
-        {"Save Changes"}
+      <Button type="submit" className="max-w-56" disabled={isSubmitting}>
+        {isSubmitting ? "Saving..." : "Save Changes"}
       </Button>
     </form>
   );
