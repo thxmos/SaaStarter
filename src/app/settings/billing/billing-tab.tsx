@@ -12,11 +12,6 @@ import {
 import Link from "next/link";
 import { SessionUser } from "@/lib/lucia";
 import { Price, Product } from "@prisma/client";
-import { useState } from "react";
-
-//TODO:
-// actually have invoices
-// dropdown starts from user subscription date
 
 export default function BillingTab({
   user,
@@ -25,10 +20,6 @@ export default function BillingTab({
   user: SessionUser;
   billingInfo: { price: Price; product: Product };
 }) {
-  const [selectedYear, setSelectedYear] = useState("2024");
-
-  const years = ["2024", "2023", "2022", "2021", "2020"];
-
   const { price, product } = billingInfo;
   const unitAmount = Number(price.unitAmount) / 100; // Convert BigInt to number and divide by 100 if it's in cents
 
