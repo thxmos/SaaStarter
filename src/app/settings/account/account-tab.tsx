@@ -26,7 +26,6 @@ import FileUpload, { FileType } from "@/components/file-upload";
 import { updateUser, uploadAvatar } from "./account.actions";
 import { getInitials } from "@/helpers";
 import { SessionUser } from "@/lib/lucia";
-import { isValidSession } from "@/actions/session.actions";
 import { THEMES } from "@/constants";
 import { useTheme } from "next-themes";
 
