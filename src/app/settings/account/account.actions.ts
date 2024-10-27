@@ -1,6 +1,6 @@
 "use server";
 
-import { getUser, isValidSession } from "@/actions/session.actions";
+import { isValidSession } from "@/actions/session.actions";
 import { uploadBlob } from "@/actions/blob.actions";
 import { updateUserAvatar } from "@/actions/user.actions";
 import { updateUserById } from "@/data-access/user";
