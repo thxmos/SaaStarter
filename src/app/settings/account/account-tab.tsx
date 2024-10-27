@@ -25,11 +25,11 @@ import {
 import FileUpload, { FileType } from "@/components/file-upload";
 import { updateUser, uploadAvatar } from "./account.actions";
 import { getInitials } from "@/helpers";
-import { SessionUser } from "@/lib/lucia";
 import { THEMES } from "@/constants";
 import { useTheme } from "next-themes";
+import { UserDto } from "@/data-access/user";
 
-export default function AccountTab({ user }: { user: SessionUser }) {
+export default function AccountTab({ user }: { user: UserDto }) {
   const { theme, setTheme } = useTheme();
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -95,9 +95,9 @@ export default function AccountTab({ user }: { user: SessionUser }) {
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <div className="w-36 grid place-items-center">
               <Avatar className="w-24 h-24">
-                <AvatarImage src={user.avatar} alt="Avatar" />
+                <AvatarImage src={user.avatar ?? undefined} alt="Avatar" />
                 <AvatarFallback className="bg-red-500 text-white text-xs">
-                  {getInitials(user?.name)}
+                  {getInitials(user?.name!)}
                 </AvatarFallback>
               </Avatar>
             </div>
@@ -129,7 +129,7 @@ export default function AccountTab({ user }: { user: SessionUser }) {
               </div>
             </DialogContent>
           </Dialog>
-          {/* <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -140,7 +140,7 @@ export default function AccountTab({ user }: { user: SessionUser }) {
                 disabled
               />
             </div>
-          </div> */}
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -184,7 +184,6 @@ export default function AccountTab({ user }: { user: SessionUser }) {
           </div>
         </CardContent>
       </Card>
-      {/* todo: make pending state */}
       <Button type="submit" className="max-w-56" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Changes"}
       </Button>

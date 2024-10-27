@@ -6,15 +6,6 @@ import { updateUserAvatar } from "@/actions/user.actions";
 import { updateUserById } from "@/data-access/user";
 import { User } from "@prisma/client";
 
-// todo: do we really need this?
-export async function getUserData() {
-  const { user } = await getUser();
-  if (user) {
-    return user;
-  }
-  return null;
-}
-
 export async function uploadAvatar(formData: FormData) {
   const isSessionValid = await isValidSession();
   if (!isSessionValid) {
