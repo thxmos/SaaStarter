@@ -19,11 +19,10 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  stripeCustomerId String? @unique
-
   session       Session[]
-  subscriptions Price[]        @relation("UserSubscriptions")
   oAuthProvider OAuthProvider?
+
+  Project Project[]
 }
 
 enum OAuthProvider {
@@ -52,44 +51,62 @@ model PasswordResetToken {
   expiresAt DateTime
 }
 
-model Price {
-  id              String               @id @default(cuid())
-  stripePriceId   String?              @unique
-  stripeProductId String?              @map("product_id")
-  active          Boolean?
-  unitAmount      BigInt?              @map("unit_amount")
-  currency        String?
-  type            PricingType?
-  interval        PricingPlanInterval?
-  intervalCount   Int?                 @map("interval_count")
-  trialPeriodDays Int?                 @map("trial_period_days")
-  metadata        Json?
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status    ProjectStatus @default(DRAFT)
+  images    String[]
 
-  productId String?
-  product   Product? @relation(fields: [productId], references: [id])
-  users     User[]   @relation("UserSubscriptions")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  Songs Song[]
+  Tasks Task[]
+
+}
+enum ProjectStatus {
+  DRAFT
+  COMPLETED
 }
 
-model Product {
-  id              String   @id @default(cuid())
-  name            String?
-  description     String?
-  image           String?
-  active          Boolean?
-  metadata        Json?
-  stripeProductId String?  @unique
+model Song {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  key       String?
+  tempo     Int?
 
-  prices Price[]
+  notes     String?
+  lyrics    String?
+  status    SongStatus @default(DEMO)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
 }
 
-enum PricingType {
-  RECURRING
-  ONE_TIME
+enum SongStatus {
+  DEMO
+  COMPLETED
 }
 
-enum PricingPlanInterval {
-  DAY
-  WEEK
-  MONTH
-  YEAR
+model Task {
+  id        String   @id @default(cuid())
+  type      TaskType
+  name      String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+}
+
+enum TaskType {
+  MARKETING
+  PROJECT
+  SONG
 }
